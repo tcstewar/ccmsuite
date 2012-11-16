@@ -22,6 +22,6 @@ class MyCell(grid.Cell):
   def load(self,char):      
     if char=='#': self.wall=True
 
-world=grid.World(MyCell,map=mymap)
+world=grid.World(MyCell,map=mymap,directions=4)
 ccm.display(world)
 world.run()

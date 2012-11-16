@@ -1,4 +1,4 @@
 ccmsuite
 ========
 
-Python cognitive modelling suite
+Python cognitive modelling suite.  

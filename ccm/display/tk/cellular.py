@@ -52,8 +52,10 @@ class CellularRenderer:
             if a.cell is None:
                 continue
 
-            x=a.cell.x
-            y=a.cell.y
+            #x=a.cell.x
+            #y=a.cell.y
+            x=a.x
+            y=a.y
 
             changed=False
             if a in self.agents:
