@@ -56,6 +56,12 @@ class CellularRenderer:
             #y=a.cell.y
             x=a.x
             y=a.y
+            
+            if world.directions==6:
+                offset=y%2
+                if offset>1: offset=2-offset
+                offset=offset/2
+                x+=offset/2
 
             changed=False
             if a in self.agents:

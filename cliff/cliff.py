@@ -41,17 +41,30 @@ class Agent(continuous.Body):
         return 'blue'
     
     def start(self):
-        while True:
-            self.turn(random.uniform(-0.1, 0.1))
-            self.go_forward(0.05)
-            yield 0.01
+        pass
+        #while True:
+        #    self.turn(random.uniform(-0.1, 0.1))
+        #    self.go_forward(0.05)
+        #    yield 0.01
+            
+
+class World(grid.World):
+    def key_pressed(self, key):
+        if key=='w':
+            agent.go_forward(0.1)
+        if key=='s':
+            agent.go_forward(-0.1)
+        if key=='a':
+            agent.turn(-0.1)
+        if key=='d':
+            agent.turn(0.1)
+        
 
 
-
-world=grid.World(Cell,map=map,directions=4)
+world=World(Cell,map=map,directions=6)
 
 agent=Agent()
-world.add(agent,cell=Cell.start_cell)
+world.add(agent,cell=Cell.start_cell, dir=0)
 
 ccm.display(world)
 world.run()
