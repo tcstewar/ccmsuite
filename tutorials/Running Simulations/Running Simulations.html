@@ -1,0 +1,416 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+
+  
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Running Simulations</title>
+    <!-- base href="http://ccmsuite.ccmlab.ca/" -->
+    <link type="text/css" rel="stylesheet" href="Running%20Simulations_files/print.css">
+      </head><body>
+        
+    <div id="node-11" class="section-1">
+  <h1 class="book-heading">Running Simulations</h1>
+  <p>The other tutorials have focused on making cognitive models and the environments
+for them to interact with.  However, the creation of models is only one part of the overall 
+modelling process.  In order for these models to be useful, we need to characterize their
+behaviour, and compare them to human performance.  Any modelling system also needs to provide
+tools to do this.</p>
+
+<p><b>Important Note:</b> For this data analysis tool to work, you will also need to have the following Python modules installed:</p>
+
+<ul>
+<li> <a href="http://numpy.scipy.org/">NumPy</a> (<a href="http://sourceforge.net/projects/numpy/files/NumPy/1.3.0/numpy-1.3.0-win32-superpack-python2.6.exe/download">click here for Windows download</a>)
+</li><li> <a href="http://scipy.org/">SciPy</a> (<a href="http://sourceforge.net/projects/scipy/files/scipy/0.7.1/scipy-0.7.1-win32-superpack-python2.6.exe/download">click here for Windows download</a>)
+</li><li> <a href="http://matplotlib.sourceforge.net/">matplotlib</a> (<a href="http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-0.99/matplotlib-0.99.0.win32-py2.6.exe/download">click here for Windows download</a>)
+</li></ul>
+  <div id="node-12" class="section-2">
+  <h1 class="book-heading">The Model: Paired Association</h1>
+  <p>For this section, we will consider a model of learning paired associations.  This was
+presented previously as an example of using visual and motor systems within ACT-R, and is
+a standard memory experiment.</p>
+
+<p>The task involves showing short words one at a time to the participant.  For each word,
+the participant must press a number from 0 to 9.  After they press a number, they are shown
+the <i>correct</i> number for 3 seconds.  Then the next word is shown.  Initially, paricipants
+only have a 10% chance of guessing the correct number, but they should improve over time.  The
+experiment consists of 10 word-number pairs, each shown in 10 blocks.  Within each block, the
+order of the words is randomized.  For each participant, the number of correct responses in 
+each block is recorded, along with the average time needed for a correct response.
+</p>
+<table id="attachments" class="sticky-enabled">
+ <thead><tr><th>Attachment</th><th>Size</th> </tr></thead>
+<tbody>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/paired.py">paired.py</a></td><td>3 KB</td> </tr>
+</tbody>
+</table>
+  </div>
+<div id="node-13" class="section-2">
+  <h1 class="book-heading">Gathering Participant Data</h1>
+  <p>In order to compare the model data to the partipant data, we need to get the participant data into
+a recognizable format.  There are two ways to do this.</p>
+
+<p>The most straightforward method is to gather participant data using whatever method you
+currently use.  Then, convert each participant's data into a separate file with the following
+format:
+
+</p><div class="geshifilter"><pre class="text geshifilter-text" style="font-family: monospace;">measure1=value1
+measure2=value2
+measure3=value3
+.
+.
+.</pre></div>
+
+For this experiment, the data file for each participant looks like this:
+
+<div class="geshifilter"><pre class="text geshifilter-text" style="font-family: monospace;">score[1]=6
+score[2]=8
+score[3]=7
+score[4]=9
+score[5]=9
+score[6]=10
+score[7]=10
+score[8]=9
+score[9]=9
+time[1]=2.02869533039
+time[2]=1.86441127222
+time[3]=1.66947366291
+time[4]=1.3937992138
+time[5]=1.47949624573
+time[6]=1.55474064343
+time[7]=1.45011063809
+time[8]=1.3589723526
+time[9]=1.33401392594</pre></div>
+
+
+
+<p>As an alternative option, we can also directly gather participant data using the same 
+environment as the model uses.  This will create data files of this format.  To do this,
+we need to make one small change to indicate that we would like to record this data
+file.
+
+</p><div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;">log=ccm.<span style="color: black;">log</span><span style="color: black;">(</span>data=<span style="color: rgb(0, 128, 0);">True</span><span style="color: black;">)</span></pre></div>
+
+
+
+<p>The data file will be stored in a directory with the same name as the file you
+are running, with the current date and time as a file name, and ending in ".data".
+
+</p>
+
+<p><b>Note:</b> If you want to quickly try this out, run the file
+"human.py". You may wish to modify the environment to be slightly
+simpler, so you don't have to go through a full run of the experiment
+to see the resulting data:
+</p><div class="geshifilter"><pre class="text geshifilter-text" style="font-family: monospace;">size=3
+trials=5
+display_time=3</pre></div>
+
+
+
+<p>To get some example human data for this task, download the human.zip
+file below and unzip it. It contains a directory "human" which contains
+a directory "default" which contains the actual data.</p>
+<table id="attachments" class="sticky-enabled">
+ <thead><tr><th>Attachment</th><th>Size</th> </tr></thead>
+<tbody>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/human.py">human.py</a></td><td>1.59 KB</td> </tr>
+ <tr class="even"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/human.zip">human.zip</a></td><td>3.74 KB</td> </tr>
+</tbody>
+</table>
+  </div>
+<div id="node-14" class="section-2">
+  <h1 class="book-heading">Running Models Repeatedly</h1>
+  <p>If a model is meant to match human behaviour, it must have some degree of randomness.
+This means that each time we run a model, it will produce different results.  For example,
+if we run paired.py we may get this as a result:
+
+</p><div class="geshifilter"><pre class="text geshifilter-text" style="font-family: monospace;"> 799.985 score[1] 1
+ 799.985 time[1] 2.12579452728
+ 799.985 score[2] 1
+ 799.985 time[2] 1.76577207801
+ 799.985 score[3] 5
+ 799.985 time[3] 2.13632477748
+ 799.985 score[4] 8
+ 799.985 time[4] 1.75225890972
+ 799.985 score[5] 8
+ 799.985 time[5] 1.98269500808
+ 799.985 score[6] 9
+ 799.985 time[6] 1.971188806
+ 799.985 score[7] 10
+ 799.985 time[7] 1.98938163628
+ 799.985 score[8] 10
+ 799.985 time[8] 1.45522416916
+ 799.985 score[9] 10
+ 799.985 time[9] 1.33454436937</pre></div>
+
+Running it again may produce
+
+<div class="geshifilter"><pre class="text geshifilter-text" style="font-family: monospace;"> 792.218 score[1] 1
+ 792.218 time[1] 2.7008427498
+ 792.218 score[2] 4
+ 792.218 time[2] 2.49810214628
+ 792.218 score[3] 6
+ 792.218 time[3] 2.17020282613
+ 792.218 score[4] 7
+ 792.218 time[4] 1.65162615481
+ 792.218 score[5] 8
+ 792.218 time[5] 1.9445980928
+ 792.218 score[6] 10
+ 792.218 time[6] 1.49069410898
+ 792.218 score[7] 9
+ 792.218 time[7] 1.46682596012
+ 792.218 score[8] 8
+ 792.218 time[8] 1.36395075132
+ 792.218 score[9] 10
+ 792.218 time[9] 1.53648977226</pre></div>
+
+As with participant data, we will need to run the model many times in order to gather the
+statistics necessary to compare the two.  We could do this the same way as with collecting
+the participant data above (by specifying data=True when creating the log), and then running
+the file multiple times.
+
+
+
+<p>However, to simplify this process, we can also create a new program which specifies that
+our experiment will be automatically run multiple times.  One of these can be seen in
+sim_1.py.
+
+</p><div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+&nbsp;
+ccm.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'paired'</span>,<span style="color: rgb(255, 69, 0);">50</span><span style="color: black;">)</span></pre></div>
+
+This will run the model 50 times.
+
+<table id="attachments" class="sticky-enabled">
+ <thead><tr><th>Attachment</th><th>Size</th> </tr></thead>
+<tbody>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/sim_1.py">sim_1.py</a></td><td>34 bytes</td> </tr>
+</tbody>
+</table>
+  </div>
+<div id="node-15" class="section-2">
+  <h1 class="book-heading">Examining the Data</h1>
+  <p>Once we have human data and model data, we can compare the two.  While we could have imported this
+data into something like SPSS, such tools are generally meant for identifying <i>differences</i>
+rather than similarities.  Also, we will eventually want to explore the effects of varying
+parameter settings in the models.  Given these issues, a separate tool would be useful for
+performing this comparison.  One such tool is built in to this modelling system.</p>
+
+<p>To use this tool, run "view.py", which is in the CCMSuite/ccm
+directory. The easiest way to run it is to copy view.py into the
+directory that contains your modelling code. When you run it, your web
+browser should open. If not,
+open your web browser and go to <a href="http://localhost:8080/">http://localhost:8080</a>.  You
+will see a list of models you have run.
+
+</p>
+
+<p>Click on "human".  This will show you the set of data that the system can find.  You can look at
+the summary statistics by clicking on "data".  This provides the mean, median, and standard
+deviation of the sample, along with the corresponding confidence intervals (95% bootstrap).
+
+</p>
+
+<p>Click on "graph".  This shows the same data in graphical format.  The following features are
+available:
+
+</p><ul>
+<li>Changing the measures that are graphed: click on the list of measures to change them.  Use
+Ctrl-click to select individual items and Shift-click for a group of items.
+</li><li>Width, height, and DPI of the graph.  If you click on the graph, a 300 dpi print-quality
+version of the graph will be shown.
+</li><li>Changing the confidence interval: 0.95 is 95%.  Bootstrap confidence intervals are used, 
+which do not assume the data has any particular distribution.  Accuracy of the bootstrap can
+be improved by increasing the number of samples.
+</li><li>Labels for the x and y axis, and the rotation for the x-axis (useful if there are many items
+graphed and the labels run into each other)
+</li><li>Margins for the left, right, top, and bottom.  This may need to be adjusted so that the
+labels fit on the graph.
+</li></ul>
+
+
+
+<p>Next, we can look at the model data.  Click on "home" and go to "paired".  You can now
+go to "data" to see the model's statistics in the same format.  Go to "graph" to view the
+data.  All of the same functions work here as before.
+
+</p>
+
+<p>We can also use this screen to directly compare the model and human data.  In the 
+"Compare to" area, enter "human".  This will show a second set of bars in the graph. 
+</p>
+  </div>
+<div id="node-16" class="section-2">
+  <h1 class="book-heading">Adjusting a Parameter</h1>
+  <p>As can be seen in the previous section, this model's performance differs from that of the participants. This is true
+both for the score and for the recall time.  As it currently stands, this is a poor model of
+this task.
+
+</p>
+
+<p>Ideally, using a cognitive architecture (such as ACT-R) would result in accurate models
+without any adjustment.  However, ACT-R is not a complete perfect theory of human cognition.
+This means there are still aspects that need to be adjusted.  In particular, while the memory,
+vision, and motor systems have been successful in many situations, some parameters do
+need to be adjusted.
+
+</p>
+
+<p>The first of these is the recall threshold.  This seems to depend on the amount of
+mental effort participants put in to recall (or the amount of time they are willing
+to weight before giving up).  There are no theoretical bases for setting this, but
+it is often found to be in the range of -1 to -2.9.  In the current model, it was set to
+-1.5.  (-1 would be little effort, and -2.9 would be extreme effort).
+
+</p>
+
+<p>We want to see how the model changes its performance as this value changes.  Again, we
+will need to run the model multiple times with these changes, so we define a new
+simulation program
+
+</p><div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+&nbsp;
+ccm.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'paired'</span>,<span style="color: rgb(255, 69, 0);">20</span>,threshold=<span style="color: black;">[</span>-<span style="color: rgb(255, 69, 0);">1</span>,-<span style="color: rgb(255, 69, 0);">1.5</span>,-<span style="color: rgb(255, 69, 0);">2</span>,-<span style="color: rgb(255, 69, 0);">2.5</span><span style="color: black;">]</span><span style="color: black;">)</span></pre></div>
+
+
+
+<p>Running this will take longer, since more settings are used.  However, you can run "view.py"
+and start examining the data while it is still running.  You can also run it on many 
+computers at the same time and copy all the results together (or configure the computers
+to share a directory).  This lets you use however many computers you have access to as a
+large computing cluster.  This will be useful as the number of parameters increases.
+
+</p>
+
+<p>View the graph for this model.  Notice that you can now look at the data for each parameter
+setting separately.  Each parameter is effectively a different model.  From the graph interface
+you can quickly switch between parameter settings.
+
+</p>
+
+<p>After running a simulation, you may feel that you need more fine-grained information about
+model performance. For example, what happens between the values chosen for the threshold?  We
+can check this by running another simulation.
+</p><div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+&nbsp;
+ccm.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'paired'</span>,<span style="color: rgb(255, 69, 0);">20</span>,threshold=<span style="color: black;">[</span>-<span style="color: rgb(255, 69, 0);">1.25</span>,-<span style="color: rgb(255, 69, 0);">1.75</span>,-<span style="color: rgb(255, 69, 0);">2.25</span>,-<span style="color: rgb(255, 69, 0);">2.75</span><span style="color: black;">]</span><span style="color: black;">)</span></pre></div>
+
+
+
+<p>View the graph again.  More data points should be available.  If you are viewing the data while
+still running the simulation, notice that the confidence intevals will slowly shrink as data
+is gathered.
+
+</p>
+
+<p>You can also view the effects of varying this paramter by setting the X-Axis drop-down list
+to be "threshold".
+
+</p>
+
+<p>The best value for the threshold seems to be around -2.  However, if you look at the
+timing data, this is quite different.  The model takes much longer to recall items than
+people do.  This timing is controlled by another ACT-R parameter, the latency.  This is usually
+found to be between 0.3 and 0.5.  We can vary this while leaving the threshold at -2.
+
+</p><div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+&nbsp;
+ccm.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'paired'</span>,<span style="color: rgb(255, 69, 0);">20</span>,threshold=-<span style="color: rgb(255, 69, 0);">2</span>,latency=<span style="color: black;">[</span><span style="color: rgb(255, 69, 0);">0.3</span>,<span style="color: rgb(255, 69, 0);">0.35</span>,<span style="color: rgb(255, 69, 0);">0.4</span>,<span style="color: rgb(255, 69, 0);">0.45</span><span style="color: black;">]</span><span style="color: black;">)</span></pre></div>
+
+<table id="attachments" class="sticky-enabled">
+ <thead><tr><th>Attachment</th><th>Size</th> </tr></thead>
+<tbody>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/sim_2.py">sim_2.py</a></td><td>62 bytes</td> </tr>
+ <tr class="even"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/sim_2b.py">sim_2b.py</a></td><td>70 bytes</td> </tr>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/sim_2c.py">sim_2c.py</a></td><td>75 bytes</td> </tr>
+</tbody>
+</table>
+  </div>
+<div id="node-17" class="section-2">
+  <h1 class="book-heading">Varying Multiple Parameters</h1>
+  <p>Adjusting the latency to fix the timing problem will start to cause the pattern in the score
+to change as well.  As is common with cognitive models, asjusting parameters affects the
+model performance in complex ways.  In this case, being faster at recall will mean items will
+decay less, leading to a better chance of remembering them.  This sort of interaction will happen
+in any theory that specifies the internal components of a system.  For example, in physics
+adjusting the properties of an electron would have a great many different side effects.
+
+</p>
+
+<p>To investigate this interaction, we can adjust two parameters at once.
+
+</p><div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+ccm.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'paired'</span>,<span style="color: rgb(255, 69, 0);">20</span>,threshold=<span style="color: black;">[</span>-<span style="color: rgb(255, 69, 0);">1.8</span>,-<span style="color: rgb(255, 69, 0);">1.9</span>,-<span style="color: rgb(255, 69, 0);">2</span>,-<span style="color: rgb(255, 69, 0);">2.1</span>,-<span style="color: rgb(255, 69, 0);">2.2</span><span style="color: black;">]</span>,latency=<span style="color: black;">[</span><span style="color: rgb(255, 69, 0);">0.3</span>,<span style="color: rgb(255, 69, 0);">0.325</span>,<span style="color: rgb(255, 69, 0);">0.35</span>,<span style="color: rgb(255, 69, 0);">0.375</span>,<span style="color: rgb(255, 69, 0);">0.4</span><span style="color: black;">]</span><span style="color: black;">)</span></pre></div>
+
+When viewing the results of these simulations, remember that we have not generated data
+for every combination of parameters.  
+
+
+
+<p>With this much data, it can be difficult to decide what parameter value is the best
+for the model.  Often, modellers will perform a search for the "best fit" for the paremeters.
+This is usually done using the Root Mean Squared Error measure, which attempts to find
+the parameter setting with the minimum average difference between model and human data.  We
+can do this by setting it to compare to "human" and putting "rmse" in the "sorting and comparison"
+field.
+
+</p>
+
+<p>Now we need to see the effects of the two parameters.  Set the X-Axis to "threshold" and
+the Y-Axis to "latency".  Now change the values to only be the ones we generated data for above.
+The result should be a root-mean-squared-error plot identifying the difference between model and
+human data.
+
+</p>
+
+<p>However, this merely indicates the average error between the sample averages of the model
+and human data.  This is not what we want if we are looking for an <i>explanation</i> of an
+effect.  Taking an average may obscure whether or not there are particular measures for which the
+model is poor.  Furthermore, it doesn't take into account the sampling error in the human
+data, which can lead to overfitting.  (There is no point in having a model which exactly fits
+the peculiarities of the sample data).
+
+</p>
+
+<p>What we want to do is determine the equivalence between the model and the human data.  For
+a single measure, this would be the maximum amount of difference between the model and human
+data that we would not be surprised to find.  That is, we want to find T such that if we
+used the null hypothesis that abs(mean(H)-mean(M))&lt;T, we would get a p-value of 0.05.  This
+puts an upper bound on the amount of error in the model.  For multiple measures, we want
+the maximum across all of the measures.
+
+</p>
+
+<p>This analysis can be done by putting "equiv" into the "sorting and comparison" box.  If
+measures are combined that use differing units, entering "relequiv" will scale the
+differences by the size of the confidence interval of the human data, making it possible
+to combine different types of measures.  This can also be useful as an indicator of how
+good a model can be: All models with relequiv values below 1.0 are statistially equivalent
+to the human data, meaning that more human data must be gathered before further model
+development would be warrented.
+
+</p>
+
+<p>From this, we can see the range of parameter settings that seem promising.  If this range
+is near the edge of what we can see on the graph, we can run a new simulation to expand that
+space.
+
+</p><div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+ccm.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'paired'</span>,<span style="color: rgb(255, 69, 0);">20</span>,threshold=<span style="color: black;">[</span>-<span style="color: rgb(255, 69, 0);">1.6</span>,-<span style="color: rgb(255, 69, 0);">1.7</span><span style="color: black;">]</span>,latency=<span style="color: black;">[</span><span style="color: rgb(255, 69, 0);">0.3</span>,<span style="color: rgb(255, 69, 0);">0.325</span>,<span style="color: rgb(255, 69, 0);">0.35</span>,<span style="color: rgb(255, 69, 0);">0.375</span>,<span style="color: rgb(255, 69, 0);">0.4</span><span style="color: black;">]</span><span style="color: black;">)</span></pre></div>
+
+Given this, we can find a range of good parameter settings for our model.  Once these models
+have been identified, we can return to the bar graphs to see how well the model does.  Remember
+that if we want the model data to be more accurate, we can simply run more simulations.
+
+<table id="attachments" class="sticky-enabled">
+ <thead><tr><th>Attachment</th><th>Size</th> </tr></thead>
+<tbody>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/sim_3.py">sim_3.py</a></td><td>104 bytes</td> </tr>
+ <tr class="even"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/sim_3b.py">sim_3b.py</a></td><td>91 bytes</td> </tr>
+</tbody>
+</table>
+  </div>
+</div>
+    
+  </body></html>

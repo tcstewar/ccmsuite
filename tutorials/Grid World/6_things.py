@@ -1,0 +1,106 @@
+import ccm
+log=ccm.log()
+
+from ccm.lib import grid
+from ccm.lib.actr import *
+
+mymap="""
+################
+#              #
+#              #
+#              #
+######### ######
+#     #        #
+#     #       D#
+#            DD#
+################
+"""
+
+class MyCell(grid.Cell):
+    dirty=False
+    def color(self):
+        if self.dirty: return 'brown'
+        elif self.wall: return 'black'
+        else: return 'white'
+    def load(self,char):      
+        if char=='#': self.wall=True
+        elif char=='D': self.dirty=True
+
+class MotorModule(ccm.Model):
+    busy=False
+    def go_forward(self):
+        if self.busy: return
+        self.busy=True
+        self.action='going forward'
+        yield 0.4
+        self.parent.body.go_forward()
+        self.action=None
+        self.busy=False
+    def go_left(self):
+        if self.busy: return
+        self.busy=True
+        self.action='turning left'
+        yield 0.1
+        self.parent.body.turn_left()
+        self.action='going forward'
+        yield 0.3
+        self.parent.body.go_forward()
+        self.action=None
+        self.busy=False
+    def go_right(self):
+        if self.busy: return
+        self.busy=True
+        self.action='turning right'
+        yield 0.1
+        self.parent.body.turn_right()
+        self.action='going forward'
+        yield 0.3
+        self.parent.body.go_forward()
+        self.action=None
+        self.busy=False
+        
+        
+
+
+class MyAgent(ACTR):
+    focus=Buffer()
+    body=grid.Body()
+    motor=MotorModule()
+
+    def init():
+        focus.set('wander')
+
+    def wandering_forward(focus='wander',motor='busy:False'):
+        motor.go_forward()
+
+    def wandering_left(focus='wander',motor='busy:False'):
+        motor.go_left()
+
+    def wandering_right(focus='wander',motor='busy:False'):
+        motor.go_right()
+
+
+class MuddyDog(ACTR):
+    focus=Buffer()
+    body=grid.Body()
+    def init():
+        focus.set('wander')
+    def wandering_forward(focus='wander'):
+        body.go_forward()
+        body.cell.dirty=True
+
+    def wandering_left(focus='wander'):
+        body.turn_left()
+
+    def wandering_right(focus='wander'):
+        body.turn_right()
+
+world=grid.World(MyCell,map=mymap)
+agent=MyAgent()
+world.add(agent,x=5,y=3)
+
+dog=MuddyDog()
+world.add(dog,x=2,y=7)
+
+ccm.display(world)
+world.run()

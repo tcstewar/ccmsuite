@@ -1,0 +1,821 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+
+  
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Introduction to ACT-R</title>
+    <!-- base href="http://ccmsuite.ccmlab.ca/" -->
+    <link type="text/css" rel="stylesheet" href="Introduction%20to%20ACT-R_files/print.css">
+      </head><body>
+        
+    <div id="node-5" class="section-1">
+  <h1 class="book-heading">Introduction to ACT-R</h1>
+  <p>The
+following notes come from two workshops that have been run on Python
+ACT-R and cognitive modelling in general: one at Ben-Gurion University
+of the Negev (March 2009) and one at the University of Basel (August
+2009).</p>
+
+<ul>
+
+<li>I am interested in mechanistic models of human cognition
+
+</li><li>Strong claim: the steps within the model reflect the steps within actual cognition
+
+</li><li>Why?  Two inter-related reasons:
+
+ <ul>
+
+ <li>Needed for predictions that cover a wide range of types of measurements
+
+ (performance, reaction time, neural activity, effects of interventions, etc.)
+
+ </li><li>Broad ranges of predictions seem to be required if we want to form <i>explanations</i>
+
+ </li></ul>
+
+</li><li>But this seems like it would open up so many more possibilities when creating a model
+
+</li><li>Modelling already suffers from having to way too many variables
+
+</li><li>Constraints
+
+ <ul>
+
+ <li>Have performance, timing and neural activity predictions all come from the same variables (as much as possible)
+
+ </li><li>Reaction times are not just another output of the model: Each internal step in
+
+ the model must take a certain amount of time (although steps may run in parallel).  Reaction
+
+ time predictions must be based on combining these times.
+
+ </li><li>Use the same basic components for all models.
+
+ </li></ul> 
+
+</li><li>The result is a <i>cognitive architecture</i>.
+
+</li><li>Ideally, once we have a solid cognitive architecture, we can make a model for a new cognitive 
+
+situation without first gathering any empirical data specifically about that situation.  Our underlying 
+
+theory of what the components are and how they are used constrains the creation of the model.
+
+</li><li>Another way to look at this is that the cognitive theory acts somewhat like a Bayesian prior.  
+
+It indicates what sort of models are likely to be accurate.  
+
+ <ul>
+
+ <li>We can use empirical evidence about this specific situation to help further specify the model.
+
+ </li><li>This evidence will be more important in areas where the theory does not make strong claims
+
+ </li><li>In areas where the cognitive theory is well established, we might trust the theory even more than 
+
+ our empirical observations (especially with small sample sizes)
+
+ </li></ul>
+
+</li></ul>
+  <div id="node-6" class="section-2">
+  <h1 class="book-heading">ACT-R</h1>
+  <ul>
+
+<li>Long term project to develop such an architecture
+
+</li><li>Used for models of mathematical reasoning, serial recall, learning paired associates, 
+
+human computer interaction, novice to expert transitions, semantic priming, n-back task,
+
+sleep deprivation, etc, etc
+
+</li><li>Initial focus on behavioural and reaction time data, now expanding into neural predictions (BOLD, some EEG)
+
+</li><li>The most widely used and evaluated cognitive architecture
+
+</li><li>Basic components:
+
+<a href="http://ccmsuite.ccmlab.ca/?q=sites/ccmsuite.ccmlab.ca/files/actr-modules_0.png" class="inline-image-link" title="View: actr-modules.png"><img src="Introduction%20to%20ACT-R_files/actr-modules_0.png" alt="actr-modules.png" title="actr-modules.png" class="inline" height="798" width="1064"></a>
+
+ <ul>
+
+ <li>Production system (if/then rules) for executive control
+
+ </li><li>Separate modules running in parallel for everything else
+
+ </li><li>A set of equations specifying the behaviour of these components
+
+ </li></ul>
+
+</li><li>Making ACT-R models
+
+ <ul>
+
+ <li>Many researchers just make models by writing code from scratch to follow the equations
+
+ </li><li>Since there are a common set of components, libraries exist that implement these
+
+ </li><li>Lisp ACT-R is the most common; directly developed by core ACT-R researchers, integrates a 
+
+ lot of sensorimotor/HCI theory as well (Fitts' law, etc.)
+
+ </li><li>Also jACT-R and Python ACT-R
+
+  <ul>
+
+  <li>We'll be using Python ACT-R
+
+  </li><li>Python
+version was developed to expose the core components of ACT-R, making it
+more suitable for connecting new components, integrating with other
+code </li><li>Lisp version seems to take new users most of a week to get into
+
+  </li><li>Plus, I'm the primary author of the Python version
+
+  </li></ul>
+
+ </li><li>Everything
+in this session applies to all versions, except when there are specific
+code examples. Python ACT-R uses a different syntax, but is the same
+underlying theory </li></ul>
+
+</li></ul>
+<table id="attachments" class="sticky-enabled">
+ <thead><tr><th>Attachment</th><th>Size</th> </tr></thead>
+<tbody>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/actr-modules_0.png">actr-modules.png</a></td><td>37.84 KB</td> </tr>
+</tbody>
+</table>
+  </div>
+<div id="node-7" class="section-2">
+  <h1 class="book-heading">Representation in ACT-R</h1>
+  <h2>Chunks</h2>
+
+<ul>
+<li>One chunk is a set of slot-value pairs
+ <ul>
+ <li><span class="geshifilter"><code class="geshifilter-text">thing:cat type:animal size:small skin:furry tail:long</code></span>
+ </li></ul>
+</li><li>unofficial limit of 7+-2 slots per chunk
+</li><li>Basis of representation throughout ACT-R
+</li><li>The different modules use chunks to pass information
+</li></ul>
+
+<h2>Buffers</h2>
+
+<ul>
+<li>A small number of data stores, each for a different purpose
+</li><li>Each can store one chunk at a time
+</li><li>Each is a physically distinct brain location
+</li><li>Can be thought of as "working memory"
+ <ul>
+ <li>Visual Buffer
+  <ul>
+  <li>Symbolic description of currently visually attended object
+  </li><li><span class="geshifilter"><code class="geshifilter-text">shape:circle color:red size:large</code></span>
+  </li><li>"what" pathway
+  </li></ul>
+ </li><li>Visual-Location Buffer
+  <ul>
+  <li>Description of current location of attention
+  </li><li>"where" pathway
+  </li></ul>
+ </li><li>Aural Buffer
+ </li><li>Manual Buffer
+ </li><li>Retrieval Buffer
+  <ul>
+  <li>Currently recalled declarative memory chunk
+  </li><li><span class="geshifilter"><code class="geshifilter-text">name:Fluffy animal:cat owner:self color:grey</code></span>
+  </li></ul>
+ </li><li>Imaginal Buffer
+  <ul>
+  <li>working memory scratchpad
+  </li></ul>
+ </li><li>Goal Buffer
+  <ul>keeps track of current task
+  <li><span class="geshifilter"><code class="geshifilter-text">action:counting current:three goal:seven</code></span>
+  </li></ul>
+ </li></ul> 
+</li></ul>
+  </div>
+<div id="node-8" class="section-2">
+  <h1 class="book-heading">Procedural Memory in ACT-R</h1>
+  <ul>
+<li>central executive control (serial bottleneck for cognition)
+</li><li>many possible actions that could be taken now; pick one
+</li><li>selection based on current context (buffers) and a set of if-then rules (productions)
+</li><li>actions can be overt (press a button, more gaze, turn a
+steering wheel) or internal (recall a memory, change information in
+working memory, visualize an object)
+</li><li>Constraints:
+ <ul>
+ <li>The "IF" portion specifies a pattern that must be present in the buffers
+ </li><li>The "THEN" portion specifies commands to send to modules and changes to chunks in buffers
+ </li><li>50msec to select and apply a production
+ </li><li>If multiple productions match, a reinforcement learning system is used to select one action
+  <ul>
+  <li>A utility is calculated for each production, choose the one with the largest utility
+  </li><li>no strong theory or evidence for any particular RL system
+  </li><li>original: <span class="geshifilter"><code class="geshifilter-text">U=PG-C &nbsp;P=success/(success+failure) &nbsp;C=time/(success+failure)</code></span>
+  </li><li>TD-learning
+  </li><li>current: when reward R occurs, all recent productions get: <span class="geshifilter"><code class="geshifilter-text">U=U+a*(R-dt-U)</code></span>
+  </li></ul>
+ </li></ul> 
+</li></ul>
+
+<h2>Examples for Procedural Memory</h2>
+
+<h3>pm_1.py</h3>
+
+<ul>
+<li>The simplest possible example
+<div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(128, 128, 128); font-style: italic;"># initial code to set up Python ACT-R</span>
+<span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+<span style="color: rgb(255, 119, 0); font-weight: bold;">from</span> ccm.<span style="color: black;">lib</span>.<span style="color: black;">actr</span> <span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> <span style="color: rgb(102, 204, 102);">*</span>
+log=ccm.<span style="color: black;">log</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+<span style="color: rgb(128, 128, 128); font-style: italic;"># define the model</span>
+<span style="color: rgb(255, 119, 0); font-weight: bold;">class</span> MyModel<span style="color: black;">(</span>ACTR<span style="color: black;">)</span>:
+    goal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> greeting<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:greet'</span><span style="color: black;">)</span>:
+        <span style="color: rgb(255, 119, 0); font-weight: bold;">print</span> <span style="color: rgb(72, 61, 139);">"Hello"</span>
+        goal.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+<span style="color: rgb(128, 128, 128); font-style: italic;"># run the model        </span>
+model=MyModel<span style="color: black;">(</span><span style="color: black;">)</span>
+ccm.<span style="color: black;">log_everything</span><span style="color: black;">(</span>model<span style="color: black;">)</span>
+model.<span style="color: black;">goal</span>.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'action:greet'</span><span style="color: black;">)</span>
+model.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: black;">)</span></pre></div>
+</li><li>One single production called <span class="geshifilter"><code class="geshifilter-text">greeting</code></span>, which fires if the goal chunk has a slot called <span class="geshifilter"><code class="geshifilter-text">action</code></span> whose value is <span class="geshifilter"><code class="geshifilter-text">greet</code></span>
+</li><li>Clears the goal afterward so that the same production doesn't keep firing over and over
+</li></ul>
+
+<h3>pm_2.py</h3>
+
+<ul>
+<li>Two different productions.  One is selected based on the contents of the goal buffer.
+<div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(128, 128, 128); font-style: italic;"># initial code to set up Python ACT-R</span>
+<span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+<span style="color: rgb(255, 119, 0); font-weight: bold;">from</span> ccm.<span style="color: black;">lib</span>.<span style="color: black;">actr</span> <span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> <span style="color: rgb(102, 204, 102);">*</span>
+log=ccm.<span style="color: black;">log</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+<span style="color: rgb(128, 128, 128); font-style: italic;"># define the model</span>
+<span style="color: rgb(255, 119, 0); font-weight: bold;">class</span> MyModel<span style="color: black;">(</span>ACTR<span style="color: black;">)</span>:
+    goal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> greeting1<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:greet style:casual person:?name'</span><span style="color: black;">)</span>:
+        <span style="color: rgb(255, 119, 0); font-weight: bold;">print</span> <span style="color: rgb(72, 61, 139);">"Hi"</span>,name
+        goal.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> greeting2<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:greet style:formal person:?name'</span><span style="color: black;">)</span>:
+        <span style="color: rgb(255, 119, 0); font-weight: bold;">print</span> <span style="color: rgb(72, 61, 139);">"Greetings"</span>,name
+        goal.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+&nbsp;
+&nbsp;
+<span style="color: rgb(128, 128, 128); font-style: italic;"># run the model        </span>
+model=MyModel<span style="color: black;">(</span><span style="color: black;">)</span>
+ccm.<span style="color: black;">log_everything</span><span style="color: black;">(</span>model<span style="color: black;">)</span>
+model.<span style="color: black;">goal</span>.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'action:greet style:formal person:Terry'</span><span style="color: black;">)</span>
+model.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: black;">)</span></pre></div>
+</li><li>Syntax: <span class="geshifilter"><code class="geshifilter-text">?x</code></span> indicates that the value may be used by the THEN portion of the rule,
+but can match anything
+</li></ul>
+
+<h3>pm_3.py</h3>
+
+<ul>
+<li>Using a large number of productions sequentially.  
+<div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(128, 128, 128); font-style: italic;"># initial code to set up Python ACT-R</span>
+<span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+<span style="color: rgb(255, 119, 0); font-weight: bold;">from</span> ccm.<span style="color: black;">lib</span>.<span style="color: black;">actr</span> <span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> <span style="color: rgb(102, 204, 102);">*</span>
+log=ccm.<span style="color: black;">log</span><span style="color: black;">(</span>html=<span style="color: rgb(0, 128, 0);">True</span><span style="color: black;">)</span>
+&nbsp;
+<span style="color: rgb(128, 128, 128); font-style: italic;"># define the model</span>
+<span style="color: rgb(255, 119, 0); font-weight: bold;">class</span> ExpertCountingModel<span style="color: black;">(</span>ACTR<span style="color: black;">)</span>:
+    goal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromOne<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting current:one target:!one'</span><span style="color: black;">)</span>:
+        goal.<span style="color: black;">modify</span><span style="color: black;">(</span>current=<span style="color: rgb(72, 61, 139);">'two'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromTwo<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting current:two target:!two'</span><span style="color: black;">)</span>:
+        goal.<span style="color: black;">modify</span><span style="color: black;">(</span>current=<span style="color: rgb(72, 61, 139);">'three'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromThree<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting current:three target:!three'</span><span style="color: black;">)</span>:
+        goal.<span style="color: black;">modify</span><span style="color: black;">(</span>current=<span style="color: rgb(72, 61, 139);">'four'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromFour<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting current:four target:!four'</span><span style="color: black;">)</span>:
+        goal.<span style="color: black;">modify</span><span style="color: black;">(</span>current=<span style="color: rgb(72, 61, 139);">'five'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromFive<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting current:five target:!five'</span><span style="color: black;">)</span>:
+        goal.<span style="color: black;">modify</span><span style="color: black;">(</span>current=<span style="color: rgb(72, 61, 139);">'six'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromSix<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting current:six target:!six'</span><span style="color: black;">)</span>:
+        goal.<span style="color: black;">modify</span><span style="color: black;">(</span>current=<span style="color: rgb(72, 61, 139);">'seven'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromSeven<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting current:seven target:!seven'</span><span style="color: black;">)</span>:
+        goal.<span style="color: black;">modify</span><span style="color: black;">(</span>current=<span style="color: rgb(72, 61, 139);">'eight'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromEight<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting current:eight target:!eight'</span><span style="color: black;">)</span>:
+        goal.<span style="color: black;">modify</span><span style="color: black;">(</span>current=<span style="color: rgb(72, 61, 139);">'nine'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromNine<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting current:nine target:!nine'</span><span style="color: black;">)</span>:
+        goal.<span style="color: black;">modify</span><span style="color: black;">(</span>current=<span style="color: rgb(72, 61, 139);">'ten'</span><span style="color: black;">)</span>        
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFinished<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting current:?x target:?x'</span><span style="color: black;">)</span>:
+        <span style="color: rgb(255, 119, 0); font-weight: bold;">print</span> <span style="color: rgb(72, 61, 139);">'Finished counting to'</span>,x
+        goal.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+&nbsp;
+<span style="color: rgb(128, 128, 128); font-style: italic;"># run the model        </span>
+model=ExpertCountingModel<span style="color: black;">(</span><span style="color: black;">)</span>
+ccm.<span style="color: black;">log_everything</span><span style="color: black;">(</span>model<span style="color: black;">)</span>
+model.<span style="color: black;">goal</span>.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'action:counting current:one target:five'</span><span style="color: black;">)</span>
+model.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: black;">)</span></pre></div>
+</li><li>Examine html log to see what is happening
+</li><li>Syntax: <span class="geshifilter"><code class="geshifilter-text">!x</code></span> says to not match if the chunk has this slot value
+</li><li>Syntax: using <span class="geshifilter"><code class="geshifilter-text">?x</code></span> twice requires the same value for both slots
+</li><li>Syntax: can also do <span class="geshifilter"><code class="geshifilter-text">!?x</code></span>, requiring a different value for both slots
+</li></ul>
+
+<h3>pm_4.py</h3>
+
+<ul>
+<li>Using multiple buffers  
+<div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(128, 128, 128); font-style: italic;"># initial code to set up Python ACT-R</span>
+<span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+<span style="color: rgb(255, 119, 0); font-weight: bold;">from</span> ccm.<span style="color: black;">lib</span>.<span style="color: black;">actr</span> <span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> <span style="color: rgb(102, 204, 102);">*</span>
+log=ccm.<span style="color: black;">log</span><span style="color: black;">(</span>html=<span style="color: rgb(0, 128, 0);">True</span><span style="color: black;">)</span>
+&nbsp;
+<span style="color: rgb(128, 128, 128); font-style: italic;"># define the model</span>
+<span style="color: rgb(255, 119, 0); font-weight: bold;">class</span> ExpertCountingModel<span style="color: black;">(</span>ACTR<span style="color: black;">)</span>:
+    goal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+    imaginal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromOne<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting target:!one'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'number:one'</span><span style="color: black;">)</span>:
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'number:two'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromTwo<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting target:!two'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'number:two'</span><span style="color: black;">)</span>:
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'number:three'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromThree<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting target:!three'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'number:three'</span><span style="color: black;">)</span>:
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'number:four'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromFour<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting target:!four'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'number:four'</span><span style="color: black;">)</span>:
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'number:five'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromFive<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting target:!five'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'number:five'</span><span style="color: black;">)</span>:
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'number:six'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromSix<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting target:!six'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'number:six'</span><span style="color: black;">)</span>:
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'number:seven'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromSeven<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting target:!seven'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'number:seven'</span><span style="color: black;">)</span>:
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'number:eight'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromEight<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting target:!eight'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'number:eight'</span><span style="color: black;">)</span>:
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'number:nine'</span><span style="color: black;">)</span>        
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFromNine<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting target:!nine'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'number:nine'</span><span style="color: black;">)</span>:
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'number:ten'</span><span style="color: black;">)</span>        
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> countFinished<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:counting target:?x'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'number:?x'</span><span style="color: black;">)</span>:
+        <span style="color: rgb(255, 119, 0); font-weight: bold;">print</span> <span style="color: rgb(72, 61, 139);">'Finished counting to'</span>,x
+        goal.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+&nbsp;
+<span style="color: rgb(128, 128, 128); font-style: italic;"># run the model        </span>
+model=ExpertCountingModel<span style="color: black;">(</span><span style="color: black;">)</span>
+ccm.<span style="color: black;">log_everything</span><span style="color: black;">(</span>model<span style="color: black;">)</span>
+model.<span style="color: black;">goal</span>.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'action:counting target:five'</span><span style="color: black;">)</span>
+model.<span style="color: black;">imaginal</span>.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'number:one'</span><span style="color: black;">)</span>
+model.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: black;">)</span></pre></div>
+</li><li>can build full models with just this
+</li><li>tends to be for well-learned expert behaviours
+</li></ul>
+
+<h3>pm_5.py</h3>
+
+<ul>
+<li>A model of repeated binary choice  
+<div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(128, 128, 128); font-style: italic;"># initial code to set up Python ACT-R</span>
+<span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+<span style="color: rgb(255, 119, 0); font-weight: bold;">from</span> ccm.<span style="color: black;">lib</span>.<span style="color: black;">actr</span> <span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> <span style="color: rgb(102, 204, 102);">*</span>
+log=ccm.<span style="color: black;">log</span><span style="color: black;">(</span>html=<span style="color: rgb(0, 128, 0);">True</span><span style="color: black;">)</span>
+&nbsp;
+<span style="color: rgb(128, 128, 128); font-style: italic;"># define the model</span>
+<span style="color: rgb(255, 119, 0); font-weight: bold;">class</span> RepeatedBinaryChoiceModel<span style="color: black;">(</span>ACTR<span style="color: black;">)</span>:
+    goal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+    pmnoise=PMNoise<span style="color: black;">(</span>noise=0.3<span style="color: black;">)</span>
+    pm=PMNew<span style="color: black;">(</span>alpha=0.2<span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> pressA<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:choose'</span><span style="color: black;">)</span>:
+        <span style="color: rgb(0, 128, 0);">self</span>.<span style="color: black;">reward</span><span style="color: black;">(</span>0.3<span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> pressB<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'action:choose'</span><span style="color: black;">)</span>:
+        <span style="color: rgb(0, 128, 0);">self</span>.<span style="color: black;">reward</span><span style="color: black;">(</span><span style="color: rgb(255, 69, 0);">0.1</span><span style="color: black;">)</span>
+&nbsp;
+&nbsp;
+<span style="color: rgb(128, 128, 128); font-style: italic;"># run the model        </span>
+model=RepeatedBinaryChoiceModel<span style="color: black;">(</span><span style="color: black;">)</span>
+ccm.<span style="color: black;">log_everything</span><span style="color: black;">(</span>model<span style="color: black;">)</span>
+model.<span style="color: black;">goal</span>.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'action:choose'</span><span style="color: black;">)</span>
+model.<span style="color: black;">run</span><span style="color: black;">(</span>limit=<span style="color: rgb(255, 69, 0);">1.5</span><span style="color: black;">)</span></pre></div>
+</li><li>might be a model of an extremely well-practiced participant,
+but highly unconstrained since it's really just the RL system at play
+here
+</li><li>The procedural memory system in ACT-R acts more as an organizational constraint on the model
+</li></ul>
+<table id="attachments" class="sticky-enabled">
+ <thead><tr><th>Attachment</th><th>Size</th> </tr></thead>
+<tbody>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/pm_1.py">pm_1.py</a></td><td>356 bytes</td> </tr>
+ <tr class="even"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/pm_2.py">pm_2.py</a></td><td>556 bytes</td> </tr>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/pm_3.py">pm_3.py</a></td><td>1.49 KB</td> </tr>
+ <tr class="even"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/pm_4.py">pm_4.py</a></td><td>1.63 KB</td> </tr>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/pm_5.py">pm_5.py</a></td><td>533 bytes</td> </tr>
+</tbody>
+</table>
+  </div>
+<div id="node-9" class="section-2">
+  <h1 class="book-heading">Declarative Memory in ACT-R</h1>
+  <ul>
+<li>Fundamental principle: 
+ <ul>
+ <li>The odds of a memory being needed decay as a power law over time
+ </li><li>If a memory occurs more than once, these odds are summed over all occurrences
+ </li><li>Reasonable match to realistic environments (Anderson &amp; Schooler, 1991)
+ </li></ul>
+</li><li>Implementation
+ <ul>
+ <li>A memory item is a chunk
+ </li><li>Each chunk has an activation value A: <span class="geshifilter"><code class="geshifilter-text">A=ln(sum(t^-d))</code></span>
+ </li><li>When trying to recall a chunk, start with a pattern constraints on the chunk, find all the chunks
+ that match this pattern, recall the one with the highest activation.
+ </li><li>Time required for recall: <span class="geshifilter"><code class="geshifilter-text">T=Fe^-A</code></span>
+ </li><li>Need some sort of randomness, so add noise to A. Traditionally, this has been logistic noise,
+ but could also be normally distributed.
+ </li><li>Can only attempt to recall one chunk at a time
+ </li><li>If A is too low (below threshold T), then recall fails
+ </li><li>Well-studied chunks end up with a fairly constant A value, plus effects of recent usage
+ </li></ul>
+</li><li>Parameters
+ <ul>
+ <li>d=0.5 (consistent across all ACT-R models)
+ </li><li>F=0.05 (indicates 50msec to recall a chunk with activation 0.  Not particularly consistent across models)
+ </li><li>s=0.3 (noise; almost always between 0.2-0.5)
+ </li><li>T=0 (recall threshold; usually -3 to 0)
+ </li></ul>
+</li></ul>
+
+<h2>Declarative Memory Examples</h2>
+
+<h3>dm_addition.py</h3>
+
+<ul>
+<li>Basic example of adding by counting (5+2 by doing 5, 6, 7)
+<div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+<span style="color: rgb(255, 119, 0); font-weight: bold;">from</span> ccm.<span style="color: black;">lib</span>.<span style="color: black;">actr</span> <span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> <span style="color: rgb(102, 204, 102);">*</span>
+log=ccm.<span style="color: black;">log</span><span style="color: black;">(</span>html=<span style="color: rgb(0, 128, 0);">True</span><span style="color: black;">)</span>
+&nbsp;
+<span style="color: rgb(255, 119, 0); font-weight: bold;">class</span> Addition<span style="color: black;">(</span>ACTR<span style="color: black;">)</span>:
+  goal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+  retrieve=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+  memory=Memory<span style="color: black;">(</span>retrieve,threshold=-3<span style="color: black;">)</span>
+  DMNoise<span style="color: black;">(</span>memory,noise=0.3<span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> init<span style="color: black;">(</span><span style="color: black;">)</span>:
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'count 0 1'</span><span style="color: black;">)</span>
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'count 1 2'</span><span style="color: black;">)</span>
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'count 2 3'</span><span style="color: black;">)</span>
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'count 3 4'</span><span style="color: black;">)</span>
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'count 4 5'</span><span style="color: black;">)</span>
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'count 5 6'</span><span style="color: black;">)</span>
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'count 6 7'</span><span style="color: black;">)</span>
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'count 7 8'</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> initializeAddition<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'add ?num1 ?num2 count:None?count sum:None?sum'</span><span style="color: black;">)</span>:
+    goal.<span style="color: black;">modify</span><span style="color: black;">(</span>count=0,<span style="color: rgb(0, 128, 0);">sum</span>=num1<span style="color: black;">)</span>
+    memory.<span style="color: black;">request</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'count ?num1 ?next'</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> terminateAddition<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'add ?num1 ?num2 count:?num2 sum:?sum'</span><span style="color: black;">)</span>:
+    goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'result ?sum'</span><span style="color: black;">)</span>
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">print</span> <span style="color: rgb(0, 128, 0);">sum</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> incrementSum<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'add ?num1 ?num2 count:?count!?num2 sum:?sum'</span>,
+                   retrieve=<span style="color: rgb(72, 61, 139);">'count ?sum ?next'</span><span style="color: black;">)</span>:
+    goal.<span style="color: black;">modify</span><span style="color: black;">(</span><span style="color: rgb(0, 128, 0);">sum</span>=next<span style="color: black;">)</span>
+    memory.<span style="color: black;">request</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'count ?count ?n2'</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> incrementCount<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'add ?num1 ?num2 count:?count sum:?sum'</span>,
+                     retrieve=<span style="color: rgb(72, 61, 139);">'count ?count ?next'</span><span style="color: black;">)</span>:
+    goal.<span style="color: black;">modify</span><span style="color: black;">(</span>count=next<span style="color: black;">)</span>
+    memory.<span style="color: black;">request</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'count ?sum ?n2'</span><span style="color: black;">)</span>
+&nbsp;
+model=Addition<span style="color: black;">(</span><span style="color: black;">)</span>
+ccm.<span style="color: black;">log_everything</span><span style="color: black;">(</span>model<span style="color: black;">)</span>
+model.<span style="color: black;">goal</span>.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'add 5 2 count:None sum:None'</span><span style="color: black;">)</span>
+model.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: black;">)</span></pre></div> 
+</li><li>Over time, doing different tasks, should show practice effects (commonly used chunks become faster)
+</li></ul>
+
+<h3>dm_rps.py</h3>
+
+<ul>
+<li>A model of playing rock paper scissors
+</li><li>Given the current situation (the last two moves the opponent played), recall a past experience
+that matches this pattern. 
+<div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(255, 119, 0); font-weight: bold;">from</span> ccm.<span style="color: black;">lib</span>.<span style="color: black;">actr</span> <span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> <span style="color: rgb(102, 204, 102);">*</span>
+<span style="color: rgb(255, 119, 0); font-weight: bold;">class</span> MemoryPlayer<span style="color: black;">(</span>ACTR<span style="color: black;">)</span>:
+    goal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+    goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'play rps'</span><span style="color: black;">)</span>
+&nbsp;
+    imaginal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+    imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'None None None'</span><span style="color: black;">)</span>
+&nbsp;
+    retrieval=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+    memory=Memory<span style="color: black;">(</span>retrieval<span style="color: black;">)</span>
+    baselevel=DMBaseLevel<span style="color: black;">(</span>memory<span style="color: black;">)</span>
+    noise=DMNoise<span style="color: black;">(</span>memory,0.3<span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> start_recall<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'play rps'</span>,choice=<span style="color: rgb(72, 61, 139);">'waiting:True'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'?last ?last2'</span><span style="color: black;">)</span>:
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'recall'</span><span style="color: black;">)</span>
+        memory.<span style="color: black;">request</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'history ?last ?last2'</span><span style="color: black;">)</span>
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> recall_fail_p<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'recall'</span>,memory=<span style="color: rgb(72, 61, 139);">'error:True'</span><span style="color: black;">)</span>:
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose paper'</span><span style="color: black;">)</span>
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> recall_fail_r<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'recall'</span>,memory=<span style="color: rgb(72, 61, 139);">'error:True'</span><span style="color: black;">)</span>:
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose rock'</span><span style="color: black;">)</span>
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> recall_fail_s<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'recall'</span>,memory=<span style="color: rgb(72, 61, 139);">'error:True'</span><span style="color: black;">)</span>:
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose scissors'</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> recall_success_r<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'recall'</span>,retrieval=<span style="color: rgb(72, 61, 139);">'history ? ? rock'</span><span style="color: black;">)</span>:
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose paper'</span><span style="color: black;">)</span>
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> recall_success_p<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'recall'</span>,retrieval=<span style="color: rgb(72, 61, 139);">'history ? ? paper'</span><span style="color: black;">)</span>:
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose scissors'</span><span style="color: black;">)</span>
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> recall_success_s<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'recall'</span>,retrieval=<span style="color: rgb(72, 61, 139);">'history ? ? scissors'</span><span style="color: black;">)</span>:
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose rock'</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> choose<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'choose ?option'</span><span style="color: black;">)</span>:
+        choice.<span style="color: black;">choose</span><span style="color: black;">(</span>option<span style="color: black;">)</span>
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'check response'</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> check_response<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'check response'</span>,choice=<span style="color: rgb(72, 61, 139);">'opponent:?choice'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'?last ?last2'</span><span style="color: black;">)</span>:
+        memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'history ?last ?last2 ?choice'</span><span style="color: black;">)</span>
+        retrieval.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'?last2 ?choice'</span><span style="color: black;">)</span>
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'play rps'</span><span style="color: black;">)</span></pre></div>
+</li></ul>
+
+<h2>Declarative Memory Variations</h2>
+
+<ul>
+ <li>Spacing Effect
+  <ul>
+  <li><span class="geshifilter"><code class="geshifilter-text">d=ce^-A+a</code></span>
+  </li><li>More accurate match to memory tasks with lots of items
+  </li><li>Individual differences captured by <span class="geshifilter"><code class="geshifilter-text">c</code></span> and <span class="geshifilter"><code class="geshifilter-text">a</code></span>
+  </li><li>Used in commercial memorization tools
+  </li></ul>
+ </li><li>Partial Matching
+  <ul>
+  <li>Sometimes we may want to have a similarity measure between slot values
+  </li><li>Attempting to recall red objects may lead to pink objects being recalled
+  </li><li>Modelled as an activation penalty value based on the difference between the target slot value and the chunk's slot value
+  </li><li><span class="geshifilter"><code class="geshifilter-text">-sum(P*M)</code></span> where P is a constant (possibly different per slot) and M is a programmer-specified
+  semantic difference.
+  </li><li>For example, if M(red,pink)=0.3 and P=1, then the chunk 'shape:circle color:pink' will have
+  its activation reduced by 0.3 when attempting to recall chunks fitting the pattern 'color:red'
+  </li><li>M=infinity unless otherwise specified. 
+  </li><li>No good theoretical guidelines for setting this.  Some people have used LSA, but no real
+  consistent results.  Pretty much just an ad-hoc method for getting semantic similarity into a model.
+  </li></ul>
+  
+ </li><li>Spreading Activation
+  <ul>
+  <li>Context effect on memory: Thinking about a topic makes facts about that topic easier to recall
+  </li><li>The chunks in working memory will cause related chunks in declarative memory to boost their activation
+  </li><li>+sum(W*(S-ln(fan+1))) where the sum is over the values in a buffer chunk and fan is the number of 
+  chunks in memory that contain that slot value
+  <h3>dm_fan.py</h3>
+  <div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> ccm
+<span style="color: rgb(255, 119, 0); font-weight: bold;">from</span> ccm.<span style="color: black;">lib</span>.<span style="color: black;">actr</span> <span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> <span style="color: rgb(102, 204, 102);">*</span>
+log=ccm.<span style="color: black;">log</span><span style="color: black;">(</span>html=<span style="color: rgb(0, 128, 0);">True</span><span style="color: black;">)</span>
+&nbsp;
+<span style="color: rgb(255, 119, 0); font-weight: bold;">class</span> FanModel<span style="color: black;">(</span>ACTR<span style="color: black;">)</span>:
+  goal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+  retrieval=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+  memory=Memory<span style="color: black;">(</span>retrieval,latency=0.63<span style="color: black;">)</span>
+  spread=DMSpreading<span style="color: black;">(</span>memory,goal<span style="color: black;">)</span>
+  spread.<span style="color: black;">strength</span>=1.6
+  spread.<span style="color: black;">weight</span><span style="color: black;">[</span>goal<span style="color: black;">]</span>=0.5
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> init<span style="color: black;">(</span><span style="color: black;">)</span>:
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'hippie in park'</span><span style="color: black;">)</span>
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'hippie in church'</span><span style="color: black;">)</span>    
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'hippie in bank'</span><span style="color: black;">)</span>    
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'captain in park'</span><span style="color: black;">)</span>    
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'captain in cave'</span><span style="color: black;">)</span>    
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'debutante in bank'</span><span style="color: black;">)</span>    
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'fireman in park'</span><span style="color: black;">)</span>    
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'giant in beach'</span><span style="color: black;">)</span>    
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'giant in castle'</span><span style="color: black;">)</span>    
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'giant in dungeon'</span><span style="color: black;">)</span>    
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'earl in castle'</span><span style="color: black;">)</span>    
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'earl in forest'</span><span style="color: black;">)</span>    
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'lawyer in store'</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> start_person<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'test ?person ?location'</span><span style="color: black;">)</span>:
+    memory.<span style="color: black;">request</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'?person in ?'</span><span style="color: black;">)</span>
+    goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'recall ?person ?location'</span><span style="color: black;">)</span>
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> start_location<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'test ?person ?location'</span><span style="color: black;">)</span>:
+    memory.<span style="color: black;">request</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'? in ?location'</span><span style="color: black;">)</span>
+    goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'recall ?person ?location'</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> respond_yes<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'recall ?person ?location'</span>,
+                  retrieval=<span style="color: rgb(72, 61, 139);">'?person in ?location'</span><span style="color: black;">)</span>:
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">print</span> <span style="color: rgb(72, 61, 139);">'yes'</span>
+    goal.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> respond_no_person<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'recall ?person ?location'</span>,
+                        retrieval=<span style="color: rgb(72, 61, 139);">'? in !?location'</span><span style="color: black;">)</span>:
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">print</span> <span style="color: rgb(72, 61, 139);">'no'</span>
+    goal.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> respond_no_location<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'recall ?person ?location'</span>,
+                        retrieval=<span style="color: rgb(72, 61, 139);">'!?person in ?'</span><span style="color: black;">)</span>:
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">print</span> <span style="color: rgb(72, 61, 139);">'no'</span>
+    goal.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+model=FanModel<span style="color: black;">(</span><span style="color: black;">)</span>
+ccm.<span style="color: black;">log_everything</span><span style="color: black;">(</span>model<span style="color: black;">)</span>
+model.<span style="color: black;">goal</span>.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'test hippie park'</span><span style="color: black;">)</span>
+model.<span style="color: black;">run</span><span style="color: black;">(</span><span style="color: black;">)</span>  
+&nbsp;</pre></div>
+  </li></ul>
+
+ </li><li>Blending
+  <ul>
+  <li>False memories: recalling chunks that are not in memory
+  </li><li>A recalled chunk could be a blending of the chunks that could be recalled, weighted by activation
+  </li><li>Not clear how to blend symbolic values
+  </li><li>But numerical values could be blended
+   <ul>
+   <li>Note: it is controversial whether or not chunks can contain numerical values, and even if
+   they can what operations should be supported on those numerical values
+   </li></ul>
+  </li><li>Could be simple linear weighted averaging 
+  </li><li>This, plus the rock paper scissors model above, gave the model that won the Technion Prediction Tournament
+  <h3>dm_rbc.py</h3>
+
+  <div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(255, 119, 0); font-weight: bold;">class</span> SequentialModel<span style="color: black;">(</span>ACTR<span style="color: black;">)</span>:
+    goal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+    goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'wait X'</span><span style="color: black;">)</span>    
+&nbsp;
+    imaginal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+    imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'A:None B:None'</span><span style="color: black;">)</span>
+&nbsp;
+    history=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+    history.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'None None'</span><span style="color: black;">)</span>
+&nbsp;
+    retrieval=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+    memory=BlendingMemory<span style="color: black;">(</span>retrieval,threshold=threshold<span style="color: black;">)</span>
+    DMNoise<span style="color: black;">(</span>memory,noise=noise<span style="color: black;">)</span>
+    DMBaseLevel<span style="color: black;">(</span>memory<span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">if</span> initialvalue <span style="color: rgb(255, 119, 0); font-weight: bold;">is</span> <span style="color: rgb(255, 119, 0); font-weight: bold;">not</span> <span style="color: rgb(0, 128, 0);">None</span>:
+      <span style="color: rgb(255, 119, 0); font-weight: bold;">for</span> h <span style="color: rgb(255, 119, 0); font-weight: bold;">in</span> <span style="color: black;">[</span><span style="color: rgb(72, 61, 139);">'A A'</span>,<span style="color: rgb(72, 61, 139);">'A B'</span>,<span style="color: rgb(72, 61, 139);">'B A'</span>,<span style="color: rgb(72, 61, 139);">'B B'</span><span style="color: black;">]</span>:
+        memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'%s A %d'</span><span style="color: rgb(102, 204, 102);">%</span><span style="color: black;">(</span>h,initialvalue<span style="color: black;">)</span><span style="color: black;">)</span>
+        memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'%s B %d'</span><span style="color: rgb(102, 204, 102);">%</span><span style="color: black;">(</span>h,initialvalue<span style="color: black;">)</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> recallA<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'wait X'</span>,top=<span style="color: rgb(72, 61, 139);">'waiting:True'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'A:None'</span>,memory=<span style="color: rgb(72, 61, 139);">'busy:False error:False'</span>,history=<span style="color: rgb(72, 61, 139);">'?a ?b'</span><span style="color: black;">)</span>:
+        memory.<span style="color: black;">request</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'?a ?b A ?'</span><span style="color: black;">)</span>
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'wait A'</span><span style="color: black;">)</span>
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> recallB<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'wait X'</span>,top=<span style="color: rgb(72, 61, 139);">'waiting:True'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'B:None'</span>,memory=<span style="color: rgb(72, 61, 139);">'busy:False error:False'</span>,history=<span style="color: rgb(72, 61, 139);">'?a ?b'</span><span style="color: black;">)</span>:
+        memory.<span style="color: black;">request</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'?a ?b B ?'</span><span style="color: black;">)</span>
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'wait B'</span><span style="color: black;">)</span>
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> storeA<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'wait A'</span>,top=<span style="color: rgb(72, 61, 139);">'waiting:True'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'A:None B:?B'</span>,retrieval=<span style="color: rgb(72, 61, 139);">'? ? A ?reward'</span><span style="color: black;">)</span>:
+        <span style="color: rgb(128, 128, 128); font-style: italic;">#memory.add(retrieval)</span>
+        retrieval.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'A:?reward B:?B'</span><span style="color: black;">)</span>
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'wait X'</span><span style="color: black;">)</span>
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> storeB<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'wait B'</span>,top=<span style="color: rgb(72, 61, 139);">'waiting:True'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'B:None A:?A'</span>,retrieval=<span style="color: rgb(72, 61, 139);">'? ? B ?reward'</span><span style="color: black;">)</span>:
+        <span style="color: rgb(128, 128, 128); font-style: italic;">#memory.add(retrieval)</span>
+        retrieval.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'B:?reward A:?A'</span><span style="color: black;">)</span>
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'wait X'</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> norecallA<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'wait A'</span>,top=<span style="color: rgb(72, 61, 139);">'waiting:True'</span>,memory=<span style="color: rgb(72, 61, 139);">'error:True'</span><span style="color: black;">)</span>:
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose A'</span><span style="color: black;">)</span>
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> norecallB<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'wait B'</span>,top=<span style="color: rgb(72, 61, 139);">'waiting:True'</span>,memory=<span style="color: rgb(72, 61, 139);">'error:True'</span><span style="color: black;">)</span>:
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose B'</span><span style="color: black;">)</span>
+&nbsp;
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> doEqualA<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'wait'</span>,top=<span style="color: rgb(72, 61, 139);">'waiting:True'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'A:?X!None B:?X'</span><span style="color: black;">)</span>:
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose A'</span><span style="color: black;">)</span>
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> doEqualB<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'wait'</span>,top=<span style="color: rgb(72, 61, 139);">'waiting:True'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'A:?X!None B:?X'</span><span style="color: black;">)</span>:
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose B'</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> doUnEqual<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'wait'</span>,top=<span style="color: rgb(72, 61, 139);">'waiting:True'</span>,imaginal=<span style="color: rgb(72, 61, 139);">'A:?A!None B:?B!None!?A'</span><span style="color: black;">)</span>:
+        <span style="color: rgb(255, 119, 0); font-weight: bold;">if</span> <span style="color: rgb(0, 128, 0);">float</span><span style="color: black;">(</span>A<span style="color: black;">)</span><span style="color: rgb(102, 204, 102);">&lt;</span>float<span style="color: black;">(</span>B<span style="color: black;">)</span>: goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose B'</span><span style="color: black;">)</span>
+        <span style="color: rgb(255, 119, 0); font-weight: bold;">else</span>: goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'choose A'</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> choose<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'choose ?X'</span>,top=<span style="color: rgb(72, 61, 139);">'waiting:True'</span><span style="color: black;">)</span>:
+        top.<span style="color: black;">choice</span><span style="color: black;">(</span>X<span style="color: black;">)</span>
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'reward ?X'</span><span style="color: black;">)</span>
+&nbsp;
+    <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> doReward<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'reward ?X'</span>,top=<span style="color: rgb(72, 61, 139);">'reward:?reward!None'</span>,history=<span style="color: rgb(72, 61, 139);">'?a ?b'</span><span style="color: black;">)</span>:
+        memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'?a ?b ?X ?reward'</span><span style="color: black;">)</span>
+        goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'wait X'</span><span style="color: black;">)</span>
+        imaginal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'A:None B:None'</span><span style="color: black;">)</span>
+        history.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'?b ?X'</span><span style="color: black;">)</span>  
+&nbsp;</pre></div>
+  </li></ul>
+
+
+ </li></ul>
+<table id="attachments" class="sticky-enabled">
+ <thead><tr><th>Attachment</th><th>Size</th> </tr></thead>
+<tbody>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/dm_addition.py">dm_addition.py</a></td><td>1.2 KB</td> </tr>
+ <tr class="even"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/dm_rps.py">dm_rps.py</a></td><td>4.32 KB</td> </tr>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/dm_fan.py">dm_fan.py</a></td><td>1.54 KB</td> </tr>
+ <tr class="even"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/dm_rbc.py">dm_rbc.py</a></td><td>5.78 KB</td> </tr>
+</tbody>
+</table>
+  </div>
+<div id="node-10" class="section-2">
+  <h1 class="book-heading">Sensory and Motor Systems</h1>
+  <ul>
+<li>inputs from and outputs to the world
+</li><li>lots of different ones
+ <ul>
+ <li>driving simulator
+ </li><li>robot control
+ </li><li>typing and mouse movement
+ </li><li>visual input from computer screens
+ </li></ul>
+</li><li>no specific theory other than "use best available empirical data"
+</li><li>Motor system copied from EPIC (Kieras &amp; Meyer, 1996)
+ <ul>
+ <li>Fitts' law for mouse and keyboard
+ </li><li>motor planning time separated from action (so actions can be planned but not yet initiated)
+ </li></ul>
+</li><li>Visual system based on separating "what" and "where" pathways 
+ <ul>
+ <h3>vision_paired.py</h3>
+ <ul>
+ <div class="geshifilter"><pre class="python geshifilter-python" style="font-family: monospace;"><span style="color: rgb(255, 119, 0); font-weight: bold;">class</span> Paired<span style="color: black;">(</span>ACTR<span style="color: black;">)</span>:
+  goal=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+  retrieve=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+  memory=Memory<span style="color: black;">(</span>retrieve,threshold=-2,latency=0.35<span style="color: black;">)</span>
+  DMBaseLevel<span style="color: black;">(</span>memory<span style="color: black;">)</span>
+  DMNoise<span style="color: black;">(</span>memory,noise=0.5<span style="color: black;">)</span>
+&nbsp;
+  visual=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+  location=Buffer<span style="color: black;">(</span><span style="color: black;">)</span>
+  vision=Vision<span style="color: black;">(</span>visual,location<span style="color: black;">)</span>    
+&nbsp;
+  motor=Motor<span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> attendProbe<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'state:start'</span>,vision=<span style="color: rgb(72, 61, 139);">'busy:False'</span>,location=<span style="color: rgb(72, 61, 139);">'?x ?y'</span><span style="color: black;">)</span>:
+    vision.<span style="color: black;">examine</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'?x ?y'</span><span style="color: black;">)</span>
+    goal.<span style="color: black;">modify</span><span style="color: black;">(</span>state=<span style="color: rgb(72, 61, 139);">'attendingProbe'</span><span style="color: black;">)</span>
+    location.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> detectStudyItem<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'state:readStudyItem word:?w!None'</span>,vision=<span style="color: rgb(72, 61, 139);">'busy:False'</span>,location=<span style="color: rgb(72, 61, 139);">'?x ?y'</span><span style="color: black;">)</span>:
+    vision.<span style="color: black;">examine</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'?x ?y'</span><span style="color: black;">)</span>
+    goal.<span style="color: black;">modify</span><span style="color: black;">(</span>state=<span style="color: rgb(72, 61, 139);">'attendingTarget'</span><span style="color: black;">)</span>
+    location.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> associate<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'state:attendingTarget word:?word!None num:?num'</span>,visual=<span style="color: rgb(72, 61, 139);">'type:Number text:?text'</span><span style="color: black;">)</span>:
+    memory.<span style="color: black;">add</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'word:?word num:?text'</span><span style="color: black;">)</span>
+    visual.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+    goal.<span style="color: rgb(0, 128, 0);">set</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'state:start word:None num:None'</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> readProbe<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'state:attendingProbe word:None'</span>,visual=<span style="color: rgb(72, 61, 139);">'type:Text text:?word'</span><span style="color: black;">)</span>:
+    memory.<span style="color: black;">request</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'word:?word'</span><span style="color: black;">)</span>
+    goal.<span style="color: black;">modify</span><span style="color: black;">(</span>state=<span style="color: rgb(72, 61, 139);">'testing'</span>,word=word<span style="color: black;">)</span>
+    visual.<span style="color: black;">clear</span><span style="color: black;">(</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> recall<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'state:testing word:?word'</span>,retrieve=<span style="color: rgb(72, 61, 139);">'word:?word num:?num'</span>,motor=<span style="color: rgb(72, 61, 139);">'busy:False'</span><span style="color: black;">)</span>:
+    motor.<span style="color: black;">press</span><span style="color: black;">(</span>num<span style="color: black;">)</span>
+    goal.<span style="color: black;">modify</span><span style="color: black;">(</span>state=<span style="color: rgb(72, 61, 139);">'readStudyItem'</span><span style="color: black;">)</span>
+&nbsp;
+  <span style="color: rgb(255, 119, 0); font-weight: bold;">def</span> cannotRecall<span style="color: black;">(</span>goal=<span style="color: rgb(72, 61, 139);">'state:testing word:?word'</span>,memory=<span style="color: rgb(72, 61, 139);">'error:True'</span><span style="color: black;">)</span>:
+    goal.<span style="color: black;">modify</span><span style="color: black;">(</span>state=<span style="color: rgb(72, 61, 139);">'readStudyItem'</span><span style="color: black;">)</span> 
+&nbsp;</pre></div>
+ </ul>
+ 
+ 
+ </ul>
+</li><li>Programming question
+ <ul> 
+ <li>how to connect the model up to a simulation of the environment?
+ </li><li>Need a simulation that's equivalent to the one people used
+ </li><li>Depends a lot on how the environment was developed
+ </li><li>might re-implement, might directly interface
+ </li><li>Python
+ACT-R comes with a simple system for making world objects and setting
+the properties that will appear in the visual buffer when that object
+is attended to </li><li>Simple system for defining motor actions, how long they take, and how they affect the environment
+ </li></ul>
+</li></ul>
+<table id="attachments" class="sticky-enabled">
+ <thead><tr><th>Attachment</th><th>Size</th> </tr></thead>
+<tbody>
+ <tr class="odd"><td><a href="http://ccmsuite.ccmlab.ca/sites/ccmsuite.ccmlab.ca/files/vision_paired.py">vision_paired.py</a></td><td>2.93 KB</td> </tr>
+</tbody>
+</table>
+  </div>
+</div>
+    
+  </body></html>
