@@ -36,7 +36,7 @@ import random
 
 class Agent(continuous.Body):
     def __init__(self):
-        grid.Body.__init__(self)
+        continuous.Body.__init__(self)
     def color(self):
         return 'gray'
     
