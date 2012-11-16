@@ -37,34 +37,42 @@ import random
 class Agent(continuous.Body):
     def __init__(self):
         grid.Body.__init__(self)
-    def colour(self):
-        return 'blue'
+    def color(self):
+        return 'gray'
     
     def start(self):
-        pass
-        #while True:
-        #    self.turn(random.uniform(-0.1, 0.1))
-        #    self.go_forward(0.05)
-        #    yield 0.01
-            
+        while True:
+            self.turn(random.uniform(-0.1, 0.1))
+            self.go_forward(0.05)
+            yield 0.01
+
+
+class Player(continuous.Body):
+    def color(self):
+        return 'blue'                
 
 class World(grid.World):
     def key_pressed(self, key):
         if key=='w':
-            agent.go_forward(0.1)
+            player.go_forward(0.1)
         if key=='s':
-            agent.go_forward(-0.1)
+            player.go_forward(-0.1)
         if key=='a':
-            agent.turn(-0.1)
+            player.turn(-0.1)
         if key=='d':
-            agent.turn(0.1)
+            player.turn(0.1)
         
 
 
-world=World(Cell,map=map,directions=6)
+world=World(Cell,map=map,directions=4)
+
+player=Player()
+world.add(player,cell=Cell.start_cell, dir=0)
 
 agent=Agent()
-world.add(agent,cell=Cell.start_cell, dir=0)
+world.add(agent,cell=Cell.start_cell)
+
+
 
 ccm.display(world)
 world.run()
