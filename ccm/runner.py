@@ -1,6 +1,6 @@
 from __future__ import generators
 
-import ccm.logger as logger
+import logger
 
 import os
 import random

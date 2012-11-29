@@ -1,8 +1,9 @@
-from ccm.ui import swi
+from ui import swi
 import webbrowser
-from ccm.ui.pytag import T
-from ccm.stats import Stats
-import ccm.runner
+from ui.pytag import T
+from stats import Stats
+import stats
+import runner
 import os
 import re
 import matplotlib
@@ -41,8 +42,8 @@ def parse_setting_name(name):
 def make_setting_name(dir,setting):
     fn='%s/code.py'%dir
     lines=file(fn).readlines()
-    params,defaults,core_code=ccm.runner.parse_code(lines)
-    return ccm.runner.make_param_text(params,defaults,setting)
+    params,defaults,core_code=runner.parse_code(lines)
+    return runner.make_param_text(params,defaults,setting)
     
 
     
@@ -51,7 +52,7 @@ def make_settings_table(dir):
     options={}
     fn='%s/code.py'%dir
     lines=file(fn).readlines()
-    params,defaults,core_code=ccm.runner.parse_code(lines)
+    params,defaults,core_code=runner.parse_code(lines)
     for name in find_settings(dir):
         setting=parse_setting_name(name)
         d=[]
@@ -249,7 +250,7 @@ class ViewerUI(swi.SimpleWebInterface):
             T.input(type='submit',value='Recalculate')
             ]
             
-        s=ccm.stats.Stats('%s/%s'%(dir,name))
+        s=stats.Stats('%s/%s'%(dir,name))
         
         statistics=['mean','median','sd']
         
@@ -285,7 +286,7 @@ class ViewerUI(swi.SimpleWebInterface):
         return html('%s <small>%s</small>'%(T.a(href='/sim/%s'%dir)[dir],name),T.div[T.a(href='/graph/%s/%s'%(dir,name))['graph'],T.br,form,'N=%d'%s.N,table])#,iframe])
         
     def swi_rawdata(self,dir,name,measure,**keys):
-        s=ccm.stats.Stats('%s/%s'%(dir,name))
+        s=stats.Stats('%s/%s'%(dir,name))
         data=s.get_raw(measure)
         
         c=ArrayPlotConfig(keys)
@@ -339,7 +340,7 @@ class ViewerUI(swi.SimpleWebInterface):
         
         
     def swi_arrayplot(self,dir,name,measure,**keys):    
-        s=ccm.stats.Stats('%s/%s'%(dir,name))
+        s=stats.Stats('%s/%s'%(dir,name))
         data=s.get_raw(measure) 
 
         c=ArrayPlotConfig(keys)
@@ -400,7 +401,7 @@ class ViewerUI(swi.SimpleWebInterface):
     
         
     def swi_histogram(self,dir,name,measure,dpi=80,width=8,height=6,b_left='0.1',b_bot='0.1',b_top='0.1',b_right='0.1',bins='20'):
-        s=ccm.stats.Stats('%s/%s'%(dir,name))
+        s=stats.Stats('%s/%s'%(dir,name))
         data=s.get_raw(measure) 
         
         bins=int(bins)
@@ -436,7 +437,7 @@ class ViewerUI(swi.SimpleWebInterface):
         params,settings,options,defaults=make_settings_table(dir)
         setting=parse_setting_name(name)
 
-        s=ccm.stats.Stats('%s/%s'%(dir,name))
+        s=stats.Stats('%s/%s'%(dir,name))
         
         if x not in options or len(options[x])<=1: x=None
         if y not in options or len(options[y])<=1: y=None
@@ -809,7 +810,7 @@ def compare_combine(method,names1,s1,ci1,names2,s2,ci2):
 
 def extract_individual_data(dir,name,bcount,conf,measures):
     if type(measures) is str: measures=[measures]
-    s=ccm.stats.Stats('%s/%s'%(dir,name))
+    s=stats.Stats('%s/%s'%(dir,name))
     names=[]
     sample=[]
     ci=[]
