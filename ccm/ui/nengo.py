@@ -1,8 +1,5 @@
 from __future__ import absolute_import
-print 'hi'
 import nengo
-
-print 'hello'
 
 class GridNode(nengo.Node):
     def __init__(self, world):
@@ -24,7 +21,7 @@ class GridNode(nengo.Node):
         agents = []
         for agent in world.agents:
             direction = agent.dir * 360.0 / world.directions
-            color = agent.color
+            color = getattr(agent, 'color', 'blue')
             if callable(color):
                 color = color()
             agent = ('<polygon points="0.25,0.25 -0.25,0.25 0,-0.5"'
