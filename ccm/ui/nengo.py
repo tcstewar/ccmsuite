@@ -2,9 +2,12 @@ from __future__ import absolute_import
 import nengo
 
 class GridNode(nengo.Node):
-    def __init__(self, world):
+    def __init__(self, world, dt=0.001):
         def svg(t):
-            svg._nengo_html_ = self.generate_svg(world)
+            last_t = getattr(svg, '_nengo_html_t_', None)
+            if last_t is None or t >= last_t + dt:
+                svg._nengo_html_ = self.generate_svg(world)
+                svg._nengo_html_t_ = t
         super(GridNode, self).__init__(svg)
 
     def generate_svg(self, world):
@@ -15,8 +18,9 @@ class GridNode(nengo.Node):
                 color = cell.color
                 if callable(color):
                     color = color()
-                cells.append('<rect x=%d y=%d width=1 height=1 style="fill:%s"/>' %
-                    (i, j, color))
+                if color is not None:
+                    cells.append('<rect x=%d y=%d width=1 height=1 style="fill:%s"/>' %
+                        (i, j, color))
 
         agents = []
         for agent in world.agents:
@@ -25,7 +29,7 @@ class GridNode(nengo.Node):
             if callable(color):
                 color = color()
             agent = ('<polygon points="0.25,0.25 -0.25,0.25 0,-0.5"'
-                     ' style="fill:%s" transform="translate(%f,%f) rotate(%f)"'
+                     ' style="fill:%s" transform="translate(%f,%f) rotate(%f)"/>'
                      % (color, agent.x+0.5, agent.y+0.5, direction))
             agents.append(agent)
 
@@ -33,6 +37,6 @@ class GridNode(nengo.Node):
             %s
             %s
             </svg>''' % (world.width, world.height, 
-                         ''.join(cells), ''.join(agents))
+                         ''.join(agents), ''.join(cells))
 
         return svg
