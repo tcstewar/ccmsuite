@@ -39,6 +39,6 @@ class GridNode(nengo.Node):
             %s
             %s
             </svg>''' % (world.width, world.height, 
-                         ''.join(agents), ''.join(cells))
+                         ''.join(cells), ''.join(agents))
 
         return svg
