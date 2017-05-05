@@ -31,7 +31,7 @@ class ScalarNode(Node):
         if len(array.shape)==0: return array
         else: return array[0]
 
-    
+
 class VectorNode(Node):
     def value_to_array(self,value):
         return numpy.array(value,dtype=numpy.float)
@@ -49,12 +49,12 @@ class CollectionNode(Node):
         return numpy.concatenate(arrays)
     def array_to_value(self,array):
         v=[]
-        print v
+        print(v)
         i=0
         for c in self.components:
             v.append(c.array_to_value(array[i:i+c.dimensions]))
             i+=c.dimensions
-        print v
+        print(v)
         return v
-        
-        
+
+

@@ -1,9 +1,9 @@
 from __future__ import generators
 
-import scheduler            
-import logger
+from . import scheduler
+from . import logger
 import random
-import inspect      
+import inspect
 import copy
 #import ccm.config as config
 
@@ -29,7 +29,7 @@ class MethodGeneratorWrapper(MethodWrapper):
   def __call__(self,*args,**keys):
       return self.obj.sch.add(self._generator,args=args,keys=keys)
   def __str__(self):
-      return '<MGW %s %s>'%(self.obj,self.func_name)    
+      return '<MGW %s %s>'%(self.obj,self.func_name)
 
 def log_everything(model,log=None):
   if log is None: log=logger.log_proxy
@@ -46,20 +46,20 @@ class Model:
     _convert_methods=True
     _auto_run_start=True
     name='top'
-    
+
     def __init__(self,log=None,**keys):
         self.__init_log=log
         for k,v in keys.items():
           setattr(self,k,v)
-    
+
     def __convert(self,parent=None,name=None):
         #if self.__converted: return
         assert self.__converted==False
-        self.__converted=True    
+        self.__converted=True
         self.changes=scheduler.Trigger()
-        
+
         if hasattr(self,'parent'): parent=self.parent
-        
+
         methods={}
         objects={}
         for klass in inspect.getmro(self.__class__):
@@ -75,7 +75,7 @@ class Model:
                             if k not in objects:
                                 objects[k]=v
         objects=copy.deepcopy(objects)
-        
+
         if parent:
             if not parent.__converted: parent.__convert()
             self.sch=parent.sch
@@ -87,56 +87,56 @@ class Model:
             if self.__init_log is True:
                 self.log=logger.log()
             elif self.__init_log is None:
-                self.log=logger.dummy   
+                self.log=logger.dummy
             else:
-                self.log=self.__init_log    
-            self.random=random.Random() 
+                self.log=self.__init_log
+            self.random=random.Random()
             #seed=config.getOptions().random
             #if seed is not None: self.random.seed(seed)
-            
-            self.parent=None   
 
-        self._convert_info(objects,methods)    
+            self.parent=None
+
+        self._convert_info(objects,methods)
 
         for name,obj in objects.items():
             if isinstance(obj,Model):
                 if not obj.__converted:
                     obj.__convert(self,name)
                 else:
-                    obj.name=name    
+                    obj.name=name
                 try:
                   self._children[name]=obj
                 except AttributeError:
-                  self._children={name:obj}  
+                  self._children={name:obj}
             self.__dict__[name]=obj
 
 
 
-        if self._convert_methods:    
-          for name,func in methods.items():        
+        if self._convert_methods:
+          for name,func in methods.items():
               if func.im_func.func_code.co_flags&0x20==0x20:
                   w=MethodGeneratorWrapper(self,func,name)
               else:
                   w=MethodWrapper(self,func,name)
-              self.__dict__[name]=w    
+              self.__dict__[name]=w
 
         if self._auto_run_start:
-            self.start()    
-        
+            self.start()
+
         for k,v in self.__dict__.items():
             if k[0]!='_' and k!='parent' and isinstance(v,Model):
                 if not v.__converted:
                     v.__convert(parent=self)
-                
-        
+
+
     def _convert_info(self,objects,methods):
-        pass    
-                
+        pass
+
     def __setattr__(self,key,value):
       if key=='parent' and value is None and getattr(self,'parent',None) is not None:
         del self.parent._children[self.name]
       self.__dict__[key]=value
-      
+
 
       if isinstance(value,Model) and key[0]!='_' and key!='parent':
         self._ensure_converted()
@@ -150,15 +150,15 @@ class Model:
             pass
             #if value.name in value.parent._children:
             #  del value.parent._children[value.name]
-          else:  
+          else:
             value.parent=self
             value.name=key
             try:
               self._children[key]=value
             except AttributeError:
-              self._children={key:value}  
+              self._children={key:value}
             if self.__converted and not value.__converted: value.__convert(name=key,parent=self)
-              
+
       if self.__converted and key[0]!='_' and key not in ['parent','sch','changes','log','random','name']:
           m=self
           done=[]
@@ -168,23 +168,23 @@ class Model:
             m=m.parent
             if m in done: m=None
           if self.log: setattr(self.log,key,value)
-      
+
       if key=='log' and value is not None:
         for k,v in self.__dict__.items():
           if k[0]!='_' and k not in ['parent','sch','changes','log','random','name']:
             if isinstance(v,(int,str,float,type(None))):
               setattr(value,k,v)
-          
-    
-    
-    
+
+
+
+
     def start(self):
         pass
     def run(self,limit=None,func=None):
         if not self.__converted:
             self.__convert()
         #if config.getOptions().logall: log_everything(self)
-        if limit is not None: 
+        if limit is not None:
             self.sch.add(self.sch.stop,limit,priority=-9999999)
         if func is not None:
             self.sch.add(func)
@@ -197,14 +197,14 @@ class Model:
         if not self.__converted:
             self.__convert()
         return self.sch.time
-    
+
     def get_children(self):
         try:
           return self._children.values()
         except AttributeError:
-          return []  
-        
-        
+          return []
+
+
     def _get_scheduler(self):
         self._ensure_converted()
         return self.sch
@@ -215,14 +215,14 @@ class Model:
 
     def _is_converted(self):
         return self.__converted
-        
-                    
-      
-      
-      
-      
-      
-    
+
+
+
+
+
+
+
+
 
 
 

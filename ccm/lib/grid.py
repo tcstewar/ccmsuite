@@ -1,6 +1,6 @@
 import ccm
 
-import cellular
+from . import cellular
 
 Cell = cellular.Cell
 

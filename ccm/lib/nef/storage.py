@@ -37,7 +37,7 @@ class Storage:
     def get(self,key,shape):
         try:
             array=numpy.fromfile(self.path(key),dtype='float32')
-        except IOError,e:
+        except IOError as e:
             return None
         try:
             if shape[1]==-1:
@@ -72,7 +72,7 @@ class Storage:
         if node.dimensions<10:        
             if node.sample_count!=node.dimensions*500:
                 ident+='_sc=%d'%node.sample_count
-        else:        
+        else:
             if node.sample_count!=5000:
                 ident+='_sc=%d'%node.sample_count
         if node.data_basis!=None:

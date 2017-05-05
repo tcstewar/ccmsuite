@@ -1,30 +1,29 @@
-
 try:
     import heapq
 except ImportError:
     import ccm.legacy.heapq as heapq
 import copy
 
-import logger
+from . import logger
 
 class Trigger:
     def __init__(self,name=''):
         self.name=name
     def __str__(self):
-        return '<Trigger "%s">'%self.name    
+        return '<Trigger "%s">'%self.name
 
 class Event:
   generator=False
-  def __init__(self,func,time,args=[],keys={},priority=0):    
+  def __init__(self,func,time,args=[],keys={},priority=0):
     self.name=getattr(func,'func_name',None)
 
     try:
        code=func.func_code
     except AttributeError:
        try:
-          code=func.__call__.im_func.func_code   
+          code=func.__call__.im_func.func_code
        except:
-          code=None   
+          code=None
     if code and code.co_flags&0x20==0x20:    # check for generator
         func=func(*args,**keys).next
         args=[]
@@ -43,7 +42,7 @@ class Event:
     return cmp((self.time,-self.priority),(other.time,-other.priority))
   def __repr__(self):
     return '<%s %x %5.3f>'%(self.name,id(self.func),self.time)
-    
+
 class SchedulerError(Exception):
     pass
 
@@ -56,18 +55,15 @@ class Scheduler:
         self.stop_flag=False
         self.log=logger.log_proxy
     def extend(self,other):
-        for k,v in other.triggers.items():    
+        for k,v in other.triggers.items():
             if k not in self.triggers:
                 self.triggers[k]=v
             else:
                 self.triggers[k].extend(v)
         if len(other.queue)>0:
             self.queue.extend(other.queue)
-            heapq.heapify(self.queue)            
+            heapq.heapify(self.queue)
     def trigger(self,key,priority=None):
-        if 'OpenGL' in key.name:
-          print key.name
-          print key in self.triggers
         if key in self.triggers:
             for event in self.triggers[key]:
                 event.time=self.time
@@ -80,11 +76,11 @@ class Scheduler:
     def add(self,func,delay=0,args=[],keys={},priority=0,thread_safe=False):
         if thread_safe:
           self.to_be_added.append((func,delay,args,keys,priority))
-        else:  
+        else:
           ev=Event(func,self.time+delay,args=args,keys=keys,priority=priority)
           self.add_event(ev)
           return ev
-        
+
     def run(self):
         self.stop_flag=False
         while not self.stop_flag and len(self.queue)>0:
@@ -92,10 +88,10 @@ class Scheduler:
             if next>self.time:
                 self.time=next
                 self.log.time=next
-            self.do_event(heapq.heappop(self.queue))    
+            self.do_event(heapq.heappop(self.queue))
             while self.to_be_added:
               self.add(*self.to_be_added.pop())
-        
+
     def handle_result(self,result,event):
         if isinstance(result,(int,float)):
             event.time=self.time+result
@@ -123,12 +119,12 @@ class Scheduler:
             if result.generator and event.generator:
                 result.parent=event
         elif hasattr(result,'default_trigger'):
-          self.handle_result(result.default_trigger,event)        
+          self.handle_result(result.default_trigger,event)
         else:
             raise SchedulerError("Incorrect 'yield': %s"%(result))
-                
-            
-            
+
+
+
     def do_event(self,event):
         assert self.time==event.time
 
@@ -140,14 +136,14 @@ class Scheduler:
           result=event.func(*event.args,**event.keys)
         except StopIteration:
           result=None
-          
+
         self.handle_result(result,event)
-        
-                               
-            
-            
-          
-        
-    
-    def stop(self):    
-      self.stop_flag=True  
+
+
+
+
+
+
+
+    def stop(self):
+      self.stop_flag=True

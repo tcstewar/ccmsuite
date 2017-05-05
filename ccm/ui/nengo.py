@@ -5,7 +5,7 @@ class GridNode(nengo.Node):
     def __init__(self, world, dt=0.001):
         def svg(t):
             last_t = getattr(svg, '_nengo_html_t_', None)
-            if t <= last_t:
+            if last_t is not None and t <= last_t:
                 last_t = None
             if last_t is None or t >= last_t + dt:
                 svg._nengo_html_ = self.generate_svg(world)
@@ -38,7 +38,7 @@ class GridNode(nengo.Node):
         svg = '''<svg width="100%%" height="100%%" viewbox="0 0 %d %d">
             %s
             %s
-            </svg>''' % (world.width, world.height, 
+            </svg>''' % (world.width, world.height,
                          ''.join(agents), ''.join(cells))
 
         return svg

@@ -11,20 +11,20 @@ def render_line(obj,cr,width,height):
     y1=obj.y1*height
     x2=obj.x2*width
     y2=obj.y2*height
-    
+
     thickness=getattr(obj,'thickness',2)
     spacing1=getattr(obj,'spacing1',0)
     spacing2=getattr(obj,'spacing2',0)
-    
+
     xx1=x1+(x2-x1)*spacing1
     xx2=x2+(x1-x2)*spacing2
     yy1=y1+(y2-y1)*spacing1
     yy2=y2+(y1-y2)*spacing2
-    
+
     cr.set_source_rgb(*obj.color)
     cr.move_to(xx1,yy1)
     cr.line_to(xx2,yy2)
-    
+
     head2=getattr(obj,'head2',0)
     if head2>0:
         scale=0.6
@@ -36,11 +36,11 @@ def render_line(obj,cr,width,height):
         cr.move_to(xx2,yy2)
         cr.line_to(xx4-dy*scale,yy4+dx*scale)
         cr.move_to(xx2,yy2)
-        cr.line_to(xx4+dy*scale,yy4-dx*scale)        
-        
-    
+        cr.line_to(xx4+dy*scale,yy4-dx*scale)
+
+
     cr.stroke()
-    
+
 
 
 
@@ -63,7 +63,7 @@ def render_area(obj,cr,width,height):
                         render_box(c,cr,width,height)
         elif hasattr(c,'x1') and hasattr(c,'y1') and hasattr(c,'x2') and hasattr(c,'y2') and hasattr(c,'color'):
             render_line(c,cr,width,height)
-        
+
 def render_box(obj,cr,width,height):
     x=obj.x*width
     y=obj.y*height
@@ -72,15 +72,15 @@ def render_box(obj,cr,width,height):
     cr.set_source_rgb(*obj.color)
     cr.rectangle(x-w/2,y-h/2,w,h)
     cr.fill()
-        
+
 def render_text(obj,cr,width,height):
     x=obj.x*width
     y=obj.y*height
-    
+
     cr.set_font_size(40)
-    
+
     fa,fd,fh,fxa,fya=cr.font_extents()
-    
+
     xb,yb,w,h,xa,ya=cr.text_extents(obj.text)
 
     cr.set_source_rgb(*obj.color)
@@ -96,7 +96,7 @@ def render_nef(obj,cr,width,height):
     elif mode=='direct':
         render_nef_direct(obj,cr,width,height)
 
-    
+
 def render_nef_spikes(obj,cr,width,height):
     size=getattr(obj,'size',10)
     scale=getattr(obj,'scale',1)
@@ -109,22 +109,22 @@ def render_nef_spikes(obj,cr,width,height):
     if col_count is None:
         col_count=neurons/row_count
         if col_count*row_count<neurons: col_count+=1
-        
+
     x=cx-col_count*size/2
     y=cy-row_count*size/2
-    
+
     v=obj.nef.value()     ## make sure the value has been updated
-        
+
     for j in range(row_count):
         for i in range(col_count):
             index=j*col_count+i
             if index<neurons:
-            
+
                 z=obj.nef.voltage[index]
                 color=(z*scale,z*scale,z*scale)
                 if obj.nef.spikes[index]>0:
                     color=(1,1,1)
-            
+
                 cr.set_source_rgb(*color)
                 cr.arc(x+i*size,y+j*size,(size-0.5)/2,0,2*pi)
                 cr.fill()
@@ -141,19 +141,19 @@ def render_nef_rate(obj,cr,width,height):
     if col_count is None:
         col_count=neurons/row_count
         if col_count*row_count<neurons: col_count+=1
-        
+
     x=cx-col_count*size/2
     y=cy-row_count*size/2
-    
+
     v=obj.nef.value()     ## make sure the value has been updated
     for j in range(row_count):
         for i in range(col_count):
             index=j*col_count+i
             if index<neurons:
-            
+
                 z=obj.nef._output[index]*scale/obj.nef.saturation_range[1]
                 color=(z*1.0,z*1.0,z*1.0)
-            
+
                 cr.set_source_rgb(*color)
                 cr.arc(x+i*size,y+j*size,(size-0.5)/2,0,2*pi)
                 cr.fill()
@@ -169,52 +169,52 @@ def render_nef_direct(obj,cr,width,height):
     if col_count is None:
         col_count=dims/row_count
         if col_count*row_count<dims: col_count+=1
-        
+
     x=cx-col_count*size/2
     y=cy-row_count*size/2
-    
+
     v=obj.nef.value()
-    
-    outline=getattr(obj,'outline',(0,0,0))    
+
+    outline=getattr(obj,'outline',(0,0,0))
     if outline is not None:
         cr.set_source_rgb(*outline)
         cr.rectangle(x,y,size*col_count,size*row_count)
         cr.stroke()
-    
+
     for j in range(row_count):
         for i in range(col_count):
             index=j*col_count+i
             if index<dims:
-            
+
                 z=v[index]*0.5+0.5
                 color=(z*1.0,z*1.0,z*1.0)
-            
+
                 cr.set_source_rgb(*color)
-                
+
                 cr.rectangle(x+i*size,y+j*size,size,size)
                 cr.fill()
-                
+
                 if getattr(obj,'show_values',False):
                     text='%1.1f'%v[index]
                     cr.set_font_size(14)
-                    
+
                     fa,fd,fh,fxa,fya=cr.font_extents()
-                    
+
                     xb,yb,w,h,xa,ya=cr.text_extents(text)
 
                     if v[index]<0.1: color=(1.0,1.0,1.0)
                     else: color=(0,0,0)
-                    
+
                     cr.set_source_rgb(*color)
                     cr.move_to(x+i*size+size/2+0.5-xb-w/2,y+j*size+size/2+0.5-fd+fh/2)
                     cr.show_text(text)
-                
+
 
 
 
 class CairoDisplay(gtk.DrawingArea):
     def __init__(self,obj,width=640,height=480,title=None):
-        gtk.DrawingArea.__init__(self)    
+        gtk.DrawingArea.__init__(self)
         if title is None: title=obj.__class__.__name__
         self.obj=obj
         self.title=title
@@ -229,7 +229,7 @@ class CairoDisplay(gtk.DrawingArea):
         self.app_window.resize(width,height)
         self.app_window.connect('key_press_event',self.on_key_press)
         self.app_window.connect("delete-event", lambda widget,event,self=self: self.obj.stop())
-        
+
         obj._get_scheduler().add(self.render_loop)
 
 
@@ -247,7 +247,7 @@ class CairoDisplay(gtk.DrawingArea):
         cr.clip()
         self.draw(cr, *self.window.get_size())
 
-    def draw(self, cr, width, height):                
+    def draw(self, cr, width, height):
         render_area(self.obj,cr,width,height)
 
 
@@ -261,14 +261,13 @@ class CairoDisplay(gtk.DrawingArea):
         elif key=='Pause':
             self.paused=not self.paused
         elif key=='Print':
-            self.save_frame()    
+            self.save_frame()
         elif key=='Escape':
-            self.obj.stop()    
+            self.obj.stop()
         else:
-            print 'key',key    
             if hasattr(self.obj,'key_pressed'):
                 self.obj.key_pressed(key)
-            return False    
+            return False
         return True
 
     def render_loop(self):
@@ -279,7 +278,7 @@ class CairoDisplay(gtk.DrawingArea):
             yield dt*self.rate
             self.queue_draw()
             while gtk.events_pending(): gtk.main_iteration(False)
-                
+
             if time.time()>next_time and obj.now()>dt:
                 self.skipped_frame=True
             while self.paused or time.time()<next_time:
@@ -291,30 +290,30 @@ class CairoDisplay(gtk.DrawingArea):
     def save_frame(self,name=None,num=None,size=None):
         if name is None: name=self.title
         if size is None: size=self.window.get_size()
-        if num is None: 
+        if num is None:
             num=self.saved_frame_counter
             self.saved_frame_counter+=1
-        
+
         surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,*size)
         cr=cairo.Context(surface)
         self.draw(cr,*size)
         surface.write_to_png("%s%04d.png"%(name,num))
-            
+
     def save_frame_eps(self,name=None,num=None,size=None):
         if name is None: name=self.title
         if size is None: size=self.window.get_size()
-        if num is None: 
+        if num is None:
             num=self.saved_frame_counter
             self.saved_frame_counter+=1
-        
+
         surface=cairo.PSSurface("%s%04d.eps"%(name,num),size[0],size[1])
         surface.set_eps(True)
         cr=cairo.Context(surface)
         self.draw(cr,*size)
         surface.write_to_png("%s%04d.png"%(name,num))
-            
 
-        
-    
+
+
+
 
 

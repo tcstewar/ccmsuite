@@ -3,7 +3,7 @@ import re
 class PatternException(Exception):
     pass
 
-def get(obj,name,key):    
+def get(obj,name,key):
   if name is None: a=obj
   else:
       a=obj[name]
@@ -17,10 +17,10 @@ def get(obj,name,key):
 
   try:
       x=a[key]
-  except AttributeError:    
+  except AttributeError:
       x=getattr(a,key)
-  if isinstance(x,float): x='%g'%x    
-  if not isinstance(x,str): x=`x`
+  if isinstance(x,float): x='%g'%x
+  if not isinstance(x,str): x=repr(x)
   return x
 
 def partialmatch(obj,name,key,b,value):
@@ -32,7 +32,7 @@ def partialmatch(obj,name,key,b,value):
   # fix for early Python versions where True and False are actually 1 and 0
   if value in ['True','False'] and type(True)==int:
       if v==str(bool(value)): return True
-      
+
   pm=b.get('_partial',None)
   if pm is not None:
     x=pm.match(key,value,v)
@@ -40,14 +40,14 @@ def partialmatch(obj,name,key,b,value):
     return True
   else:
     return False
-    
+
 
 
 class Pattern:
     def __init__(self,patterns,bound=None,partial=None):
         self.funcs=parse(patterns,bound)
         self.partial=partial
-        
+
     def match(self,obj):
         b={}
         b['_partial']=self.partial
@@ -58,16 +58,16 @@ class Pattern:
                 if f(obj,b)==False:  return None
         except (AttributeError,TypeError,KeyError):
             return None
-        del b['_partial']    
-        return b    
-            
+        del b['_partial']
+        return b
 
 
-        
-        
+
+
+
 def parse(patterns,bound=None):
     if not hasattr(patterns,'items'):
-      patterns={None:patterns} 
+      patterns={None:patterns}
     funcs=[]
     vars={}
     funcs2=[]
@@ -84,7 +84,7 @@ def parse(patterns,bound=None):
                 else:
                   def callfunc(x,b,name=name,p=p):
                     return p(x[name],b)
-                funcs2.append(callfunc)        
+                funcs2.append(callfunc)
             elif isinstance(p,basestring):
                 namedSlots=False
                 for j,text in enumerate(p.split()):
@@ -99,7 +99,7 @@ def parse(patterns,bound=None):
                         text=text[m.end():]
                         if len(text)==0:
                             raise PatternException("No value for slot '%s' in pattern '%s'"%(key,pattern))
-                        namedSlots=True          
+                        namedSlots=True
                     else:
                         if namedSlots!=False:
                             raise PatternException("Found unnamed slot '%s' after named slot in pattern '%s'"%(text,pattern))
@@ -118,7 +118,7 @@ def parse(patterns,bound=None):
                             t=m.group(1)
                             funcs.append(lambda x,b,name=name,key=key,t=t: get(x,name,key)!=t)
                             continue
-        
+
                         m=re.match('\?(\w+)',text)
                         if m!=None:
                             text=text[m.end():]
@@ -127,14 +127,14 @@ def parse(patterns,bound=None):
                                 funcs.append(lambda x,b,name=name,key=key,t=bound[v]: partialmatch(x,name,key,b,t))
                             elif v in vars:
                                 funcs2.append(lambda x,b,name=name,key=key,v=v: partialmatch(x,name,key,b,b[v]))
-                            else:    
+                            else:
                                 vars[v]=(name,key)
                                 def setfunc(x,b,name=name,key=key,v=v):
                                   b[v]=get(x,name,key)
                                   return True
                                 funcs.append(setfunc)
                             continue
-        
+
                         m=re.match('!\?(\w+)',text)
                         if m!=None:
                             text=text[m.end():]
@@ -145,11 +145,11 @@ def parse(patterns,bound=None):
                                 funcs2.append(lambda x,b,name=name,key=key,v=v: get(x,name,key)!=b[v])
                             continue
 
-                        raise PatternException("Unknown text '%s' in pattern '%s'"%(text,pattern))  
-    return funcs+funcs2                        
-        
+                        raise PatternException("Unknown text '%s' in pattern '%s'"%(text,pattern))
+    return funcs+funcs2
 
-        
-        
-        
-        
+
+
+
+
+

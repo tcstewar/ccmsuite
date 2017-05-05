@@ -9,14 +9,6 @@ __revision__ = "$Id: textwrap.py 46863 2006-06-11 19:42:51Z tim.peters $"
 
 import string, re
 
-# Do the right thing with boolean values for all known Python versions
-# (so this module can be copied to projects that don't depend on Python
-# 2.3, e.g. Optik and Docutils).
-try:
-    True, False
-except NameError:
-    (True, False) = (1, 0)
-
 __all__ = ['TextWrapper', 'wrap', 'fill']
 
 # Hardcode the recognized whitespace characters to the US-ASCII
@@ -371,4 +363,4 @@ def dedent(text):
 if __name__ == "__main__":
     #print dedent("\tfoo\n\tbar")
     #print dedent("  \thello there\n  \t  how are you?")
-    print dedent("Hello there.\n  This is indented.")
+    print(dedent("Hello there.\n  This is indented."))

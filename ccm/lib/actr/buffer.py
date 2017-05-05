@@ -1,6 +1,10 @@
 import ccm
 
-from UserDict import UserDict
+try:
+    from UserDict import UserDict
+except:
+    from collections import UserDict
+
 
 class Chunk(UserDict):
   def __init__(self,contents,bound=None):

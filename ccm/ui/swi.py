@@ -54,12 +54,9 @@ class HTTPServer(SocketServer.ThreadingMixIn,BaseHTTPServer.HTTPServer):
 testingUser=None
 
 def makeDBFromMultipart(data):
-  print 1,`data`
   db={}
   boundary=data[:data.find('\n')+1].strip()
   n=len(boundary)
-  
-  print 'boundary',`boundary`
 
   i=0
   while 1:
@@ -81,12 +78,11 @@ def makeDBFromMultipart(data):
     db[name]=val
 
     i=j
-  print db
   return db
 
 
 def makeDBFromLine(data):
-  if '\n' in data: 
+  if '\n' in data:
     data,x=data.split('\n',1)
     data=data.strip()
   db={}
@@ -198,10 +194,6 @@ class SimpleWebInterface(BaseHTTPServer.BaseHTTPRequestHandler):
       self.path,data=self.path.split('?',1)
       db2=makeDBFromLine(data)
       db.update(db2)
-      
-    print self.path  
-    print db
-
 
     if self.path=='': self.path='/'
     self.path=fixText(self.path)

@@ -67,6 +67,6 @@ class Connection:
         
 def connect(x,y,func=None,weight=None,tau=None):
     if func is not None and not callable(func):
-        print func
+        print(func)
         raise Exception('connection function is invalid')
     return Connection(x,y,func=func,weight=weight,tau=tau)

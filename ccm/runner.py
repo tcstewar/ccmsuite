@@ -1,6 +1,6 @@
 from __future__ import generators
 
-import logger
+from . import logger
 
 import os
 import random
@@ -19,8 +19,8 @@ def file_exists(filename):
         return os.access(filename,os.F_OK)
     elif using_java:
         return File(filename).exists()
-        
-    
+
+
 
 
 def parse_code(lines):
@@ -56,22 +56,22 @@ def make_param_text(params,defaults,settings):
         if pp in settings and '%s'%settings[pp]!='%s'%defaults[pp]:
             v=settings[pp]
             p.append('%s(%s)'%(pp,v))
-    if len(p)==0: return 'default'        
+    if len(p)==0: return 'default'
     return ' '.join(p)
 
 
 def fix_setting(v):
-    if not isinstance(v,(int,float)): 
-        v=`v`
+    if not isinstance(v,(int,float)):
+        v=repr(v)
     return v
 
 
 def make_settings_combinations(settings,keys=None):
     if keys is None: keys=settings.keys()
-    if len(keys)==0: 
+    if len(keys)==0:
         yield {}
         return
-    
+
     k=keys.pop()
     v=settings[k]
     for setting in make_settings_combinations(settings,keys):
@@ -97,31 +97,31 @@ def ensure_backup(fn,lines):
             t=os.stat(name).st_mtime
             text=time.strftime('%Y%m%d-%H%M%S',time.localtime(t))
             name2='%s/code-%s.py'%(fn[:-3],text)
-            
+
             os.rename(name,name2)
             f=file(name,'w')
             f.write(''.join(lines))
             f.close()
-    
+
 
 run_external=None
 def run_with(script):
     global run_external
     run_external=script
-    
+
 
 
 def run(_filename,_iterations=1,**settings):
     if not _filename.endswith('.py'): _filename+='.py'
     if not file_exists(_filename):
         raise 'Could not find file: %s'%_filename
-    
+
     lines=file(_filename).readlines()
     params,defaults,core_code=parse_code(lines)
-    
+
     ensure_backup(_filename,lines)
-    
-    
+
+
     f=None
     fname='.ccmtmp%08x.py'%random.randrange(0,0x70000000)
 
@@ -129,7 +129,7 @@ def run(_filename,_iterations=1,**settings):
       for setting in make_settings_combinations(settings):
         param_code=make_param_code(params,defaults,setting)
         param_text=make_param_text(params,defaults,setting)
-        
+
         if 'ccm.log' not in core_code:
             core_code='import ccm\nccm.log()\n'+core_code
 
@@ -137,27 +137,27 @@ def run(_filename,_iterations=1,**settings):
         code=code.replace('\r\n','\n')
         logline='ccm.log(data=True,screen=False,directory="%s/%s")'%(_filename[:-3],param_text)
         code=re.sub(r'ccm\.log\([^)]*\)',logline,code)
-                
-        print _filename,'%d/%d'%(i,_iterations),param_text
-        
+
+        print('%s %d/%d %s'%(_filename, i, _iterations, param_text))
+
         f=file(fname,'w')
         f.write(code)
         f.flush()
-        
+
         if run_external is None:
             compiled=compile(code,fname,'exec')
-            exec compiled in {}
+            exec(compiled, {})
             logger.finished()
         else:
-            os.system('%s %s'%(run_external,fname))    
+            os.system('%s %s'%(run_external,fname))
         f.close()
     os.remove(fname)
-        
+
 
 
 if __name__=='__main__':
     run()
-  
 
-        
+
+
 

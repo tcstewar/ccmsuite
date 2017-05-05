@@ -14,11 +14,11 @@ class ActivityNode(ArrayNode):
     decoder_noise_use_gamma=False
     decoder_noise_use_limit=False
     decoder_noise_use_activity=False
-    
-    
+
+
     lesion_size=0
     lesion_cells=None
-    
+
     def configure(self,neurons,lif=True,saturation_range=(200,300),
                   t_ref=0.001,t_rc=0.01,J_threshold=1,activation_noise=0.1,apply_noise=False,
                   threshold_coverage=0.9,threshold_min=None,threshold_max=None,
@@ -36,7 +36,7 @@ class ActivityNode(ArrayNode):
         self.threshold_coverage=threshold_coverage
         self.threshold_min=threshold_min
         self.threshold_max=threshold_max
-        if sample_count is None: 
+        if sample_count is None:
             sample_count=self.dimensions*500
             if sample_count>5000: sample_count=5000
         self.sample_count=sample_count
@@ -55,21 +55,21 @@ class ActivityNode(ArrayNode):
         self.initialize_node()
 
         self.mode='rate'
-        
+
         if self.sample_count<self.neurons:
             self.decoder_mode='NxS'
             self.decoder_noise_use_limit=True
         else:
             self.decoder_mode='NxN'
-            self.decoder_noise_use_gamma=True  
-            
+            self.decoder_noise_use_gamma=True
+
 
 
     def set(self,value,calc_output=True):
         ArrayNode.set(self,value,calc_output=False)
         if self.mode=='rate':
             if value is None:
-                self._set_activity=None            
+                self._set_activity=None
             else:
                 c=self.array_to_current(self._set_array)+self.Jbias
                 self._set_activity=self.current_to_activity(c)
@@ -81,7 +81,7 @@ class ActivityNode(ArrayNode):
             if self.mode!='rate': return ArrayNode.array(self)
             self._array=self.activity_to_array(self._output)
         return self._array
-        
+
     def _calc_output(self):
         if self.mode!='rate': return ArrayNode._calc_output(self)
         if self._set_activity is not None:
@@ -91,7 +91,7 @@ class ActivityNode(ArrayNode):
         if self.apply_noise:
             out=self.add_activation_noise(out)
         self._output=out
-  
+
     def _transmit_rate_direct(self,conn,dt):
         x=self.activity_to_array(self._output,decoder=self.get_decoder(conn.func))
         conn.pop2.accumulator.add(conn.apply_weight(x),conn.tau,dt)
@@ -104,7 +104,7 @@ class ActivityNode(ArrayNode):
 
     def initialize_node(self):
         random=numpy.random.RandomState(seed=self.seed)
-        
+
         if self.data_alphas is not None and self.data_Jbiases is not None:
             self.alpha=numpy.array([self.data_alphas[i%len(self.data_alphas)] for i in range(self.neurons)],dtype=numpy.dtype('float32'))
             self.Jbias=numpy.array([self.data_Jbiases[i%len(self.data_Jbiases)] for i in range(self.neurons)],dtype=numpy.dtype('float32'))
@@ -122,12 +122,12 @@ class ActivityNode(ArrayNode):
                 max_thresh=self.max-delta
                 if self.threshold_min is not None: min_thresh=self.threshold_min
                 if self.threshold_max is not None: max_thresh=self.threshold_max
-                        
+
                 thresh=random.uniform(min_thresh,max_thresh,(self.neurons,1))
             else:
                 N=len(self.data_thresholds)
                 thresh=numpy.array([[self.data_thresholds[i%N] for i in range(self.neurons)]],dtype=numpy.dtype('float32')).T
-                
+
             self.initialize_neurons(sat,thresh)
 
         if self.data_basis is None:
@@ -145,10 +145,10 @@ class ActivityNode(ArrayNode):
             if scale!=1.0: self.sample_generator.scale=scale
             offset=(self.max+self.min)/2.0
             if scale!=0.0: self.sample_generator.offset=offset
-        
 
-    
-        
+
+
+
 
     def initialize_neurons(self,saturations,thresholds):
         saturations=numpy.array(saturations,dtype=numpy.float32)
@@ -164,7 +164,7 @@ class ActivityNode(ArrayNode):
             z2=numpy.where(y2<=0,1.0,1.0/(1-numpy.exp((self.t_ref-(1.0/y2))/self.t_rc)))
             numpy.seterr(divide='warn')
             m=(z1-z2)/(x1-x2)
-            b=z1-m*x1            
+            b=z1-m*x1
         self.alpha,self.Jbias=m,b
         self.Jbias.shape=self.Jbias.shape[0]
         self.alpha.shape=self.alpha.shape[0]
@@ -180,7 +180,7 @@ class ActivityNode(ArrayNode):
             numpy.seterr(invalid='warn',divide='warn')
             return G
 
-        
+
     def array_to_current(self,array):
         b=self.basis
         phi_x=numpy.dot(b,array)
@@ -193,17 +193,17 @@ class ActivityNode(ArrayNode):
         J=self.alpha*phi_x.T
         return J.T
 
-                
+
     def activity_to_array(self,activity,decoder=None):
         if activity is None: activity=numpy.zeros(self.neurons)
-        if self.lesion_size>0: 
+        if self.lesion_size>0:
             activity=activity[:]
             activity[:self.lesion_size]=0.0
         if self.lesion_cells is not None:
             activity[self.lesion_cells]=0.0
         if decoder is None:
             decoder=self.get_decoder()
-        array=numpy.dot(activity.T,decoder)            
+        array=numpy.dot(activity.T,decoder)
         return array
 
     def add_activation_noise(self,actv,noise=None):
@@ -213,18 +213,18 @@ class ActivityNode(ArrayNode):
             actv=numpy.maximum(0,actv)
         return actv
 
-            
-            
+
+
     def get_decoder(self,func=None,noise=None):
         if self.decoder_mode=='NxN':
             decoder=self.get_decoder_NxN
         elif self.decoder_mode=='NxS':
             decoder=self.get_decoder_NxS
         else:
-            raise Exception('Unknown decoder mode: %s'%self.decoder_mode)    
-        return decoder(func=func,noise=noise)        
-        
-            
+            raise Exception('Unknown decoder mode: %s'%self.decoder_mode)
+        return decoder(func=func,noise=noise)
+
+
 
     def get_decoder_NxN(self,func=None,noise=None):
         if noise is None: noise=self.activation_noise
@@ -242,18 +242,18 @@ class ActivityNode(ArrayNode):
         name+='-%4.2f'%noise
         name_gammainv+='-%4.2f'%noise
         if noise>0:
-            if self.decoder_noise_use_gamma: 
+            if self.decoder_noise_use_gamma:
                 name+='g'
                 name_gammainv+='g'
-            if self.decoder_noise_use_limit: 
+            if self.decoder_noise_use_limit:
                 name+='l'
                 name_gammainv+='l'
-            if self.decoder_noise_use_activity: 
+            if self.decoder_noise_use_activity:
                 name+='a'
                 name_gammainv+='a'
                 name_upsilon+='-%4.2fa'%noise
                 name_gamma+='-%4.2fa'%noise
-            
+
 
         if name in self.decoders: return self.decoders[name]
         decoder=self.storage.get(name,(self.neurons,-1))
@@ -265,7 +265,7 @@ class ActivityNode(ArrayNode):
         warning=False
         if self.neurons>self.decoder_size_warning:
             warning=True
-            print 'Warning: calculating decoder for size %d neural group.  This may take a while.'%self.neurons
+            print('Warning: calculating decoder for size %d neural group.  This may take a while.'%self.neurons)
 
 
         upsilon=None
@@ -284,9 +284,9 @@ class ActivityNode(ArrayNode):
             gamma,moments=calc_gamma_moments(self,dr=0.01)
             gamma*=self.sample_count
             ups=self.basis*moments[1].reshape((moments[1].shape[0],1))*self.sample_count
-            
+
           else:
-        
+
             self.sample_generator.reset()
             count=self.sample_count
             ups=None
@@ -295,7 +295,7 @@ class ActivityNode(ArrayNode):
                 if not self.sample_generator.can_continue(self.dimensions):
                     s=count
                 if warning:
-                    print 'processing %d of %d samples (%d left)'%(s,self.sample_count,count)
+                    print('processing %d of %d samples (%d left)'%(s,self.sample_count,count))
                 samples=self.sample_generator.get(s)
                 count-=s
 
@@ -311,7 +311,7 @@ class ActivityNode(ArrayNode):
                     g=numpy.dot(actv,actv.T)
                     if gamma is None: gamma=g
                     else: gamma+=g
-                    
+
                 if upsilon is None:
                     samples=samples.T
                     if func is not None:
@@ -322,32 +322,32 @@ class ActivityNode(ArrayNode):
                     if ups is None: ups=u
                     else: ups+=u
           if need_gamma:
-                self.storage.set(name_gamma,gamma)                
+                self.storage.set(name_gamma,gamma)
           if upsilon is None:
                 upsilon=ups
                 self.storage.set(name_upsilon,upsilon)
-                
+
         error_flag=False
-        if need_gammainv:   
+        if need_gammainv:
             if self.decoder_noise_use_gamma:
                 if noise>0:
                     gamma+=numpy.identity(gamma.shape[0])*(((noise*self.saturation_range[1])**2)*self.sample_count)
-        
+
             if warning:
-                print 'inverting %dx%d gamma matrix'%gamma.shape
-                    
+                print('inverting %dx%d gamma matrix'%gamma.shape)
+
             w,v=numpy.linalg.eigh(gamma)
             limit=svd_limit*max(w)
-            
+
             if self.decoder_noise_use_limit:
                 if noise>0: limit=noise*noise*max(w)
-                
+
             for i in range(len(w)):
                 if w[i]<limit: w[i]=0
                 else: w[i]=1.0/w[i]
             gamma_inv=numpy.dot(v,numpy.multiply(w[:,numpy.core.newaxis],v.T))
-            self.storage.set(name_gammainv,gamma_inv)                
-        
+            self.storage.set(name_gammainv,gamma_inv)
+
         decoder=numpy.dot(gamma_inv,upsilon)
         if len(decoder.shape)==1:
             decoder.shape=decoder.shape[0],1
@@ -372,18 +372,18 @@ class ActivityNode(ArrayNode):
         name+='-%4.2f'%noise
         name_Ainv+='-%4.2f'%noise
         if noise>0:
-            if self.decoder_noise_use_limit: 
+            if self.decoder_noise_use_limit:
                 name+='l'
                 name_Ainv+'l'
-            if self.decoder_noise_use_activity: 
+            if self.decoder_noise_use_activity:
                 name+='a'
                 name_Ainv+='a'
                 name_B+='-%4.2fa'%noise
 
 
 
-        
-        
+
+
         if name in self.decoders: return self.decoders[name]
         decoder=self.storage.get(name,(self.neurons,-1))
         if decoder is not None:
@@ -394,15 +394,15 @@ class ActivityNode(ArrayNode):
         warning=False
         if self.neurons>self.decoder_size_warning:
             warning=True
-            print 'Warning: calculating decoder for size %d neural group.  This may take a while.'%self.neurons
+            print('Warning: calculating decoder for size %d neural group.  This may take a while.'%self.neurons)
 
 
         B=self.storage.get(name_B,(self.sample_count,-1))
         Ainv=self.storage.get(name_Ainv,(self.sample_count,self.neurons))
-        
+
         need_B=B is None
         need_A=Ainv is None
-        
+
         if B is None or Ainv is None:
             self.sample_generator.reset()
             count=self.sample_count
@@ -412,7 +412,7 @@ class ActivityNode(ArrayNode):
                 if not self.sample_generator.can_continue(self.dimensions):
                     s=count
                 if warning:
-                    print 'processing %d of %d samples (%d left)'%(s,self.sample_count,count)
+                    print('processing %d of %d samples (%d left)'%(s,self.sample_count,count))
                 samples=self.sample_generator.get(s)
                 count-=s
 
@@ -423,10 +423,10 @@ class ActivityNode(ArrayNode):
                     actv=numpy.random.normal(actv,noise*self.saturation_range[1])
                     actv=numpy.maximum(0,actv)
                     actv=numpy.array(actv,dtype=numpy.float32)
-                
+
                 if need_A:
                     if A is None: A=actv
-                    else: 
+                    else:
                         A=numpy.hstack((A,actv))
                 if need_B:
                     samples=samples.T
@@ -435,19 +435,19 @@ class ActivityNode(ArrayNode):
                             samples=samples[:,0]
                         samples=numpy.array([self.value_to_array(func(self.array_to_value(x))) for x in samples],dtype=numpy.float32)
                     if B is None: B=samples
-                    else: 
+                    else:
                         B=numpy.vstack((B,samples))
         if need_A:
             if warning:
-                print 'inverting %dx%d activity matrix'%A.shape
-        
+                print('inverting %dx%d activity matrix'%A.shape)
+
             Ainv=numpy.linalg.pinv(A,rcond=noise*0.1)
             self.storage.set(name_Ainv,Ainv)
         if need_B:
             self.storage.set(name_B,B)
-            
-            
-        
+
+
+
         decoder=numpy.dot(Ainv.T,B)
         if len(decoder.shape)==1:
             decoder.shape=decoder.shape[0],1
@@ -455,15 +455,15 @@ class ActivityNode(ArrayNode):
         self.decoders[name]=decoder
         self.storage.set(name,decoder)
         return decoder
-        
 
-        
+
+
 
 
 def make_hash_info(obj):
     if isinstance(obj,(bool,type(None),int,float,str)):
         return [hash(obj)]
-       
+
     r=[]
     if hasattr(obj,'func_code'):
         r.append(obj.__name__)
@@ -485,7 +485,7 @@ def make_hash_info(obj):
         keys=dir(obj)
         keys.sort()
         for k in keys:
-          if k[0]!='_':  
+          if k[0]!='_':
             v=getattr(obj,k)
             if isinstance(v,(bool,type(None),int,float,str)):
                 r.extend([k,hash(v)])

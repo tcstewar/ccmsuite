@@ -18,6 +18,11 @@ def file_exists(filename):
     elif using_java:
         return File(filename).exists()
 
+try:
+    basestring         # For Python 2 compatibility
+except NameError:
+    basestring = str   # For Python 3 compatibility
+
 
 class Trace:
     def __init__(self):
@@ -34,7 +39,7 @@ class Trace:
 
         self.data[key].append((self.index,value))
         self.index+=1
-            
+
     def keys(self):
         return self.data.keys()
     def fixed_keys(self):
@@ -48,7 +53,7 @@ class Trace:
             for i,val in self.data[v]:
                 if i not in pts: pts.append(i)
         pts.sort()
-        return pts    
+        return pts
 
     def merge_pts(self,pts,key):
         times=[x[0] for x in self.data[key]]
@@ -72,7 +77,7 @@ class Trace:
                 group=[p]
                 while i<len(times) and p>=times[i]:
                     i+=1
-        if len(group)>0: yield group  
+        if len(group)>0: yield group
 
     def get_at(self,name,time):
         d=self.data[name]
@@ -95,16 +100,16 @@ class Log:
         self.directory=sys.argv[0]
         self.using_default_directory=True
         if self.directory.endswith('.py'): self.directory=self.directory[:-3]
-        
+
         self.start_time=time.time()
         self.last_flush=self.start_time
-        
+
         self.reset()
-        
+
     def use_directory(self,dir):
         self.directory=dir
-        self.using_default_directory=False    
-        
+        self.using_default_directory=False
+
 
     def set(self,key,value):
         if key=='time': self.time=value
@@ -112,34 +117,34 @@ class Log:
             self.display_value(key,value)
         if self.do_data or self.do_summary:
             self.data[key]=value
-        if self.do_html:    
+        if self.do_html:
             self.trace.add(key,value)
 
     def display_value(self,key,value):
         if key!='time':
-            print '%8.3f %s %s'%(self.time,key,value)
+            print('%8.3f %s %s'%(self.time,key,value))
     def display_all(self):
         if self.time>0:
-            print 'Total time: %8.3f'%self.time
+            print('Total time: %8.3f'%self.time)
         items=self.data.items()
         items.sort()
         for k,v in items:
             if k!='time':
-                print ' %s %s'%(k,v)
+                print(' %s %s'%(k,v))
 
     def get_time_code(self):
         t=time.strftime('%Y%m%d-%H%M%S',time.localtime(self.start_time))
         return '%s-%s'%(t,self.id)
-        
+
     def ensure_directory_exists(self):
         if not file_exists(self.directory+'/'): os.makedirs(self.directory)
-        
+
     def reset(self):
         self.trace=Trace()
         self.data={}
         self.time=0
         self.id='%08x'%int(random.randrange(0x7FFFFFFF))
-  
+
 
 
 class DummyLog:
@@ -156,7 +161,7 @@ class DummyLog:
     pass
   def __getitem__(self,key):
     return self
-dummy=DummyLog()    
+dummy=DummyLog()
 
 
 class LogProxy:
@@ -170,7 +175,7 @@ class LogProxy:
       if key=='_': self._set(value)
       else: self.__dict__[key]=value
     else:
-      getattr(self,key)._set(value)  
+      getattr(self,key)._set(value)
 
   def __getattr__(self,key):
     if key.startswith('_'):
@@ -181,10 +186,10 @@ class LogProxy:
       s=LogProxy(self._log,'%s.%s'%(self._prefix,key))
       self.__dict__[key]=s
       return s
-        
+
   def __setitem__(self,key,value):
-      self[key]._set(value)  
-  
+      self[key]._set(value)
+
   def __getitem__(self,key):
       s=self._sub.get(key,None)
       if s is not None: return s
@@ -193,13 +198,13 @@ class LogProxy:
       return s
 
   def _set(self,value):
-    try:  
+    try:
       if not isinstance(value,(int,float,bool,basestring,tuple,list,dict)):
-        value=`value`
+        value=repr(value)
     except TypeError:
-        value=`value`
-    self._log.set(self._prefix,value)  
-  
+        value=repr(value)
+    self._log.set(self._prefix,value)
+
   def __nonzero__(self):
     return True
 
@@ -221,7 +226,7 @@ pending_output=[]
 def finished(flush=True):
     log=singleton_log
     has_data=log.data or log.trace
-    
+
     if has_data:
         if log.do_summary:
             log.display_all()
@@ -244,10 +249,10 @@ def finished(flush=True):
                 f.write('%s=%s\n'%(k,v))
             f.close()
         del pending_output[:]
-        log.last_flush=time.time()        
+        log.last_flush=time.time()
     log.reset()
-    
-    
 
-atexit.register(finished,flush=True)   
+
+
+atexit.register(finished,flush=True)
 

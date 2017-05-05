@@ -211,7 +211,7 @@ class World:
         for j in range(fh):
             line = lines[j]
             for i in range(min(fw, len(line))):
-                self.grid[starty + j][startx + i].load(line[i])
+                self.grid[int(starty + j)][int(startx + i)].load(line[i])
 
     def update(self):
         if hasattr(self.Cell, 'update'):
@@ -232,7 +232,7 @@ class World:
                 oldCell = a.cell
                 a.update()
         self.age += 1
-        
+
     def get_offset_in_direction(self, x, y, dir):
         if self.directions == 8:
             dx, dy = [(0, -1), (1, -1), (
@@ -246,8 +246,8 @@ class World:
             else:
                 dx, dy = [(1, 0), (1, 1), (0, 1), (-1, 0),
                           (0, -1), (1, -1)][dir]
-        return dx, dy                  
-        
+        return dx, dy
+
 
     def get_point_in_direction(self, x, y, dir):
         dx, dy = self.get_offset_in_direction(x, y, dir)
