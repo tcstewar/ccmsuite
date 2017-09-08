@@ -13,11 +13,15 @@ class CompiledProduction(Production):
         for k,v in pre_bound.items():
             code1.append(' %s=%s'%(k,repr(v)))
         code1.append(' if True:  # compiled from %s'%pre.name)
+        added_line = False
         for line in pre.code.splitlines():
             for k in keep:
                 if line.strip().startswith(k):
                     code1.append('  '+line)
+                    added_line = True
                     break
+        if not added_line:
+            code1.append('  pass')
 
         code1='\n'.join(code1)
         for k,v in pre_bound.items():
